@@ -1,0 +1,1664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MScSM Co-op Radar</title>
+<meta name="description" content="Paid sustainability internships and co-ops in the GTA and remote in Canada, for the May–August 2027 work term.">
+<link rel="icon" href="../assets/radar-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Spectral:wght@400;500;600&family=UnifrakturMaguntia&family=VT323&display=swap">
+<style>[hidden]{display:none!important} body{margin:0} :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+
+/* Layout: an instrument panel. A dark sidebar (radar mark, views with counts, refresh status) beside a two-pane
+   workspace: the role ledger on the left, the selected role's full card on the right, with the May–Aug work-term
+   strip above. Under 1180px the role card slides in as a drawer; on phones the sidebar becomes a top tab row. */
+:root {
+  --bg: #eef3f5;
+  --surface: #ffffff;
+  --surface-2: #e7eef1;
+  --ink: #0f1e26;
+  --muted: #566771;
+  --line: #d4dde2;
+  --accent: #0f6873;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcecee;
+  --urgent: #a94c06;
+  --urgent-soft: #f8e6d6;
+  --good: #23704a;
+  --good-soft: #e1f1e7;
+  --scrim: rgba(15, 30, 38, 0.46);
+  --side: #0e2b32;
+  --side-ink: #dce9eb;
+  --side-muted: #8ea9af;
+  --side-line: #1f444d;
+  --side-hover: #153a43;
+  --side-active: #1d4d57;
+  --side-cta: #5bbfca;
+  --side-cta-ink: #06161a;
+  --blip: #f0a75e;
+  --logo-bg-l: 90%;
+  --logo-ink-l: 27%;
+  --font-display: "Aptos Display", "Aptos", "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Aptos", "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-num: var(--font-body);
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-pixel: var(--font-body);
+  --magenta: #b0306f;
+  --danger: #b3263f;
+  --moon: var(--accent);
+  --gold: var(--good);
+  --panel: var(--surface);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b141a; --surface: #111d24; --surface-2: #17262f; --ink: #e1eaee; --muted: #8fa2ac; --line: #23343e;
+    --accent: #5bbfca; --accent-ink: #08151a; --accent-soft: #163640; --urgent: #f0a75e; --urgent-soft: #3a2614; --good: #6fcf9a; --good-soft: #14291d;
+    --scrim: rgba(2, 6, 9, 0.66);
+    --side: #081419; --side-ink: #d3e2e6; --side-muted: #7f989f; --side-line: #18303a; --side-hover: #10232b; --side-active: #163640;
+    --logo-bg-l: 22%; --logo-ink-l: 80%;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b141a; --surface: #111d24; --surface-2: #17262f; --ink: #e1eaee; --muted: #8fa2ac; --line: #23343e;
+  --accent: #5bbfca; --accent-ink: #08151a; --accent-soft: #163640; --urgent: #f0a75e; --urgent-soft: #3a2614; --good: #6fcf9a; --good-soft: #14291d;
+  --scrim: rgba(2, 6, 9, 0.66);
+  --side: #081419; --side-ink: #d3e2e6; --side-muted: #7f989f; --side-line: #18303a; --side-hover: #10232b; --side-active: #163640;
+  --logo-bg-l: 22%; --logo-ink-l: 80%;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+a { color: var(--accent); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.small { font-size: 13px; color: var(--muted); }
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; font-weight: 700; font-size: 14px; text-decoration: none; color: var(--ink); white-space: nowrap; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.sm { padding: 5px 10px; font-size: 13px; }
+.spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--side-cta); display: inline-block; margin-right: 6px; animation: pulse 1.4s ease-in-out infinite; vertical-align: 1px; }
+@keyframes pulse { 50% { opacity: .25; } }
+
+/* shell */
+.app { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100vh; }
+.side { position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--side); color: var(--side-ink);
+  display: flex; flex-direction: column; gap: 18px; padding: 20px 14px 18px max(16px, env(safe-area-inset-left, 0px)); }
+.brand { display: flex; align-items: center; gap: 11px; padding: 0 6px; }
+.mark { width: 38px; height: 38px; flex: none; }
+.mark .bg { fill: var(--side-active); }
+.mark .ring { fill: none; stroke: var(--side-ink); stroke-width: 1.5; opacity: .8; }
+.mark .sweep { fill: var(--side-cta); opacity: .3; }
+.mark .arm { stroke: var(--side-ink); stroke-width: 1.8; stroke-linecap: round; }
+.mark .blip { fill: var(--blip); }
+.brand-name { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: -0.01em; line-height: 1.1; }
+.brand-sub { font-size: 12px; color: var(--side-muted); }
+.brand { flex-wrap: wrap; row-gap: 8px; }
+.brand-credit { flex-basis: 100%; font-size: 11.5px; color: var(--side-muted); }
+.btn.sound { flex: none; width: 38px; height: 38px; padding: 0; color: var(--muted); }
+.sound svg { width: 18px; height: 18px; }
+.sound .wave { display: none; }
+.btn.sound.on { color: var(--accent); }
+.sound.on .wave { display: inline; }
+.sound.on .mute { display: none; }
+.night, .cal-key .k-room { display: none; }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--side-muted); font-weight: 700; padding: 12px 10px 5px; }
+.nav button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; color: var(--side-ink); padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: left; }
+.nav button svg { width: 16px; height: 16px; flex: none; opacity: .75; }
+.nav button:hover { background: var(--side-hover); }
+.nav button[aria-current="page"] { background: var(--side-active); }
+.nav button[aria-current="page"] svg { opacity: 1; color: var(--side-cta); }
+.nav .n { margin-left: auto; font-family: var(--font-num); font-size: 12px; color: var(--side-muted); font-variant-numeric: tabular-nums; }
+.side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px 6px 0; border-top: 1px solid var(--side-line); }
+.status { font-size: 12.5px; color: var(--side-muted); line-height: 1.45; }
+.status b { color: var(--side-ink); }
+.snapnote { background: var(--side-active); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: var(--side-ink); }
+.side .btn { background: transparent; color: var(--side-ink); border-color: var(--side-line); }
+.side .btn:hover { border-color: var(--side-muted); }
+.side .btn.primary { background: var(--side-cta); border-color: var(--side-cta); color: var(--side-cta-ink); }
+.side-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.side-tools .btn { font-size: 12.5px; padding: 5px 9px; }
+.main { min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 24px max(20px, env(safe-area-inset-right, 0px)) 48px 24px; }
+
+/* top bar */
+.topbar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; }
+.topbar h1 { font-size: clamp(26px, 3.2vw, 34px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.08; }
+.topbar .sub { margin: 6px 0 0; color: var(--muted); max-width: 64ch; font-size: 14.5px; }
+.search { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; flex: 0 1 340px; min-width: 0; }
+.search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.search svg { width: 16px; height: 16px; color: var(--muted); flex: none; }
+.search input { border: 0; background: transparent; padding: 9px 0; width: 100%; min-width: 0; outline: none; }
+.search kbd { font-family: var(--font-mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+
+/* overview: summary numbers and the work-term strip */
+.overview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px; }
+@media (max-width: 1000px) { .overview { grid-template-columns: minmax(0, 1fr); } }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.metric { padding: 14px 16px; border-left: 1px solid var(--line); min-width: 0; }
+.metric:first-child { border-left: 0; }
+.metric b { display: block; font-family: var(--font-display); font-size: 28px; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.metric span { font-size: 12.5px; color: var(--muted); }
+.metric.warn b { color: var(--urgent); }
+@media (max-width: 560px) {
+  .calwrap { display: none; }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metric:nth-child(3) { border-left: 0; }
+  .metric:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+.calwrap { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-width: 0; }
+.cal { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(38px, 1fr); gap: 4px; margin-top: 8px; overflow-x: auto; padding-bottom: 2px; }
+.cal .m { border-radius: 6px; padding: 5px 2px 4px; text-align: center; background: var(--surface-2); min-width: 0; }
+.cal .m .c { font-family: var(--font-num); font-weight: 600; font-size: 15px; display: block; }
+.cal .m .n { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.cal .m.win { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.cal .m.zero .c { color: var(--muted); font-weight: 500; }
+.cal-key { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
+.cal-key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+
+/* filters */
+.filters { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.filters.only-sort .seg, .filters.only-sort #fType, .filters.only-sort #fMode { display: none; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 6px 11px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.filters select { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 10px; font-size: 13.5px; }
+.count { margin-left: auto; font-size: 13px; color: var(--muted); }
+
+/* workspace: ledger + role card */
+.work { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 16px; align-items: start; }
+.ledger { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; min-width: 0; }
+.row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; text-align: left; border: 0; border-top: 1px solid var(--line); background: transparent; padding: 13px 14px; color: var(--ink); }
+.row:first-child { border-top: 0; }
+.row:hover { background: var(--surface-2); }
+.row[aria-current="true"] { background: var(--accent-soft); }
+.row.dim { opacity: .6; }
+.logo { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 17px; background: hsl(var(--h) 42% var(--logo-bg-l)); color: hsl(var(--h) 50% var(--logo-ink-l)); }
+.row-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.row-title { font-weight: 700; font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
+.row-sub { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.row-marks { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.row-side { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; text-align: right; }
+.pay { font-family: var(--font-num); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--good); line-height: 1.1; white-space: nowrap; }
+.pay small { font-size: .7em; color: var(--muted); font-weight: 500; }
+.row .pay { font-size: 15px; }
+.due { font-size: 12px; font-weight: 700; border-radius: 6px; padding: 2px 7px; background: var(--surface-2); white-space: nowrap; }
+.due.soon { background: var(--urgent-soft); color: var(--urgent); }
+.due.none { font-weight: 500; color: var(--muted); background: transparent; padding-inline: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 11.5px; border-radius: 999px; padding: 1px 8px; background: var(--surface-2); color: var(--muted); font-weight: 600; }
+.chip.new { background: var(--accent); color: var(--accent-ink); }
+.chip.mark { background: var(--accent-soft); color: var(--accent); }
+.chip.ok { background: var(--good-soft); color: var(--good); }
+.chip.int { background: var(--good); color: var(--surface); }
+.chip.no { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); }
+.top-tools { display: flex; align-items: center; gap: 8px; flex: 0 1 470px; min-width: 0; }
+.top-tools .search { flex: 1 1 auto; }
+.top-tools .btn svg { width: 15px; height: 15px; flex: none; }
+.empty { padding: 36px 22px; text-align: center; color: var(--muted); }
+.empty h3 { color: var(--ink); font-size: 20px; margin-bottom: 6px; }
+.empty p { margin: 0; }
+
+.detail { position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; min-width: 0; }
+.d-wrap { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.detail h2 { font-size: clamp(22px, 2.4vw, 28px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.12; margin-top: 4px; }
+.d-org { display: flex; align-items: center; gap: 10px; margin-top: 10px; color: var(--muted); }
+.d-org .logo { width: 32px; height: 32px; font-size: 14px; border-radius: 8px; }
+.d-org b { color: var(--ink); font-weight: 600; }
+.d-pay { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; padding: 14px 16px; background: var(--good-soft); border-radius: 10px; }
+.d-pay .pay { font-size: 30px; }
+.d-pay .pay-raw { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; flex: 1 1 200px; }
+.d-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.track { display: flex; gap: 6px; flex-wrap: wrap; }
+.track button { border: 1px solid var(--line); background: transparent; border-radius: 6px; font-size: 13px; font-weight: 600; padding: 4px 10px; color: var(--muted); }
+.track button:hover { border-color: var(--muted); color: var(--ink); }
+.track button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.d-sec h3 { font-family: var(--font-body); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+.d-sec p { margin: 0; max-width: 68ch; }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 18px; margin: 0; font-size: 14px; padding-top: 16px; border-top: 1px solid var(--line); }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.facts dd.warn { color: var(--urgent); font-weight: 600; }
+.back { display: none; }
+.detail-scrim { display: none; }
+
+/* job boards view */
+.boards { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+.links a { font-size: 13px; font-weight: 600; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; text-decoration: none; background: var(--surface); }
+.links a:hover { border-color: var(--accent); }
+.foot { color: var(--muted); font-size: 13px; max-width: 80ch; margin: 0; }
+.org { color: var(--muted); margin-top: 2px; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); background: var(--ink); color: var(--bg); padding: 9px 14px; border-radius: 8px; font-size: 14px; z-index: 40; max-width: calc(100% - 32px); }
+
+/* under 1180px: the role card becomes a drawer */
+@media (max-width: 1179px) {
+  .work { grid-template-columns: minmax(0, 1fr); }
+  .detail { position: fixed; top: 0; right: 0; bottom: 0; width: min(580px, 100%); max-height: none; border-radius: 0; border-width: 0 0 0 1px; z-index: 25;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+    transform: translateX(105%); visibility: hidden; transition: transform .22s ease, visibility 0s linear .22s; }
+  body.detail-open { overflow: hidden; }
+  body.detail-open .detail { transform: none; visibility: visible; transition: transform .22s ease; }
+  body.detail-open .detail-scrim { display: block; position: fixed; inset: 0; background: var(--scrim); z-index: 24; }
+  .d-wrap { padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+  .back { display: inline-flex; align-self: flex-start; }
+}
+/* phones: sidebar becomes a top bar with scrolling tabs */
+@media (max-width: 819px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; height: auto; overflow: visible; gap: 12px; padding: 14px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); }
+  .nav { flex-direction: row; overflow-x: auto; gap: 4px; padding-bottom: 2px; scrollbar-width: none; }
+  .nav-label { display: none; }
+  .nav button { width: auto; flex: none; padding: 7px 11px; }
+  .side-foot { margin-top: 0; padding-top: 10px; }
+  .main { padding: 18px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); }
+  .search { flex: 1 1 100%; }
+  .top-tools { flex: 1 1 100%; }
+  .search kbd { display: none; }
+  .d-wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); }
+}
+/* Mac app window: hidden title bar, so leave room for the window buttons */
+html.desk .side { padding-top: 52px; }
+html.desk .main { padding-top: 44px; }
+@media (max-width: 819px) { html.desk .side { padding-top: 44px; } html.desk .main { padding-top: 18px; } }
+@media (prefers-reduced-motion: reduce) { .spin, .pulse { animation: none; } .detail { transition: none !important; } }
+
+/* cover letters: per-role writer and the student's own details */
+body.locked { overflow: hidden; }
+.scrim { position: fixed; inset: 0; z-index: 30; background: var(--scrim); display: flex; align-items: flex-start; justify-content: center; overflow-y: auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 28px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 28px) max(16px, env(safe-area-inset-left, 0px)); }
+.sheet { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; width: 100%; max-width: 780px; min-width: 0;
+  display: flex; flex-direction: column; gap: 14px; padding: 18px 20px 20px; }
+.sheet-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.sheet-head h2 { font-size: clamp(21px, 3vw, 26px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.12; margin-top: 2px; }
+.x { border: 1px solid transparent; background: transparent; font-size: 24px; line-height: 1; padding: 2px 9px 5px; color: var(--muted); border-radius: 8px; }
+.x:hover { border-color: var(--line); color: var(--ink); }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 14px; }
+.fields .wide { grid-column: 1 / -1; }
+@media (max-width: 640px) { .fields { grid-template-columns: minmax(0, 1fr); } }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label { font-size: 13px; font-weight: 700; }
+.field .hint { font-size: 12px; color: var(--muted); }
+.field input, .field textarea, .field select { border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 8px; padding: 8px 10px; font-size: 14px; width: 100%; min-width: 0; }
+.field textarea { resize: vertical; line-height: 1.45; }
+.group-label { grid-column: 1 / -1; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+.paste summary { cursor: pointer; font-weight: 700; font-size: 14px; }
+.letter-out { width: 100%; min-height: 380px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px; padding: 16px 18px;
+  font: 15px/1.62 var(--font-body); resize: vertical; }
+.letter-out[readonly] { opacity: .85; }
+.sheet-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sheet-foot .grow { flex: 1 1 160px; min-width: 0; }
+.notice { background: var(--urgent-soft); color: var(--urgent); border-radius: 8px; padding: 10px 12px; font-size: 14px; font-weight: 600;
+  display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; }
+.sheet .pulse { background: var(--accent); }
+.upload { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; border: 1px dashed var(--line); border-radius: 10px; padding: 12px 14px; }
+.upload .grow { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.upload.drag { border-color: var(--accent); background: var(--accent-soft); }
+
+/* ---------- Neon gothic skin ----------
+   A night castle seen through a neon HUD. A blood moon and a neon-outlined castle sit on the horizon over a crimson
+   grid floor, with bats crossing the sky. Panels are framed like gilded castle windows, titles burn in blackletter neon,
+   and the start-month strip reads as a castle map: blue rooms hold open roles, red rooms are the May–Aug window.
+   Crimson = actions, violet = selection, moonlight = info, candle amber = urgency, gold = pay. Dark only by design. */
+html:root.arcade {
+  --bg: #08040f; --surface: #140a22; --surface-2: #1f1233; --ink: #f4ebe3; --muted: #ab9bbd; --line: #3b2654;
+  --accent: #ff2b56; --accent-ink: #17020a; --accent-soft: rgba(255, 43, 86, .14);
+  --urgent: #ffb347; --urgent-soft: rgba(255, 179, 71, .13); --good: #f3c969; --good-soft: rgba(243, 201, 105, .07);
+  --magenta: #b46bff; --danger: #ff5f7e; --moon: #8fe6ff; --gold: #f3c969;
+  --panel: rgba(16, 8, 28, .86);
+  --scrim: rgba(4, 1, 10, .76);
+  --side: #0b0515; --side-ink: #efe4f6; --side-muted: #9a88b0; --side-line: #2a1a40; --side-hover: #170c28; --side-active: #231338;
+  --side-cta: #ff2b56; --side-cta-ink: #17020a; --blip: #ffb347;
+  --font-display: "UnifrakturMaguntia", "Cinzel", Georgia, serif;
+  --font-body: "Spectral", Georgia, "Times New Roman", serif;
+  --font-num: "VT323", ui-monospace, Menlo, Consolas, monospace;
+  --font-pixel: "Cinzel", "Spectral", Georgia, serif;
+  --orn-tl: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 30 30%22 fill=%22none%22 stroke=%22%23f3c969%22 stroke-width=%221.3%22 stroke-linecap=%22round%22%3E%3Cpath d=%22M1.5 29V9Q1.5 1.5 9 1.5H29%22/%3E%3Cpath d=%22M5.5 29V12Q5.5 5.5 12 5.5H29%22 stroke-opacity=%22.45%22/%3E%3Cpath d=%22M11.5 11.5l3.2 3.2M17 11.5c-3 0-5.5 2.5-5.5 5.5%22 stroke-opacity=%22.8%22/%3E%3Crect x=%229%22 y=%229%22 width=%225%22 height=%225%22 transform=%22rotate%2845 11.5 11.5%29%22 fill=%22%23f3c969%22 stroke=%22none%22/%3E%3C/svg%3E");
+  --orn-tr: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 30 30%22 fill=%22none%22 stroke=%22%23f3c969%22 stroke-width=%221.3%22 stroke-linecap=%22round%22%3E%3Cg transform=%22matrix%28-1 0 0 1 30 0%29%22%3E%3Cpath d=%22M1.5 29V9Q1.5 1.5 9 1.5H29%22/%3E%3Cpath d=%22M5.5 29V12Q5.5 5.5 12 5.5H29%22 stroke-opacity=%22.45%22/%3E%3Cpath d=%22M11.5 11.5l3.2 3.2M17 11.5c-3 0-5.5 2.5-5.5 5.5%22 stroke-opacity=%22.8%22/%3E%3Crect x=%229%22 y=%229%22 width=%225%22 height=%225%22 transform=%22rotate%2845 11.5 11.5%29%22 fill=%22%23f3c969%22 stroke=%22none%22/%3E%3C/g%3E%3C/svg%3E");
+  --orn-bl: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 30 30%22 fill=%22none%22 stroke=%22%23f3c969%22 stroke-width=%221.3%22 stroke-linecap=%22round%22%3E%3Cg transform=%22matrix%281 0 0 -1 0 30%29%22%3E%3Cpath d=%22M1.5 29V9Q1.5 1.5 9 1.5H29%22/%3E%3Cpath d=%22M5.5 29V12Q5.5 5.5 12 5.5H29%22 stroke-opacity=%22.45%22/%3E%3Cpath d=%22M11.5 11.5l3.2 3.2M17 11.5c-3 0-5.5 2.5-5.5 5.5%22 stroke-opacity=%22.8%22/%3E%3Crect x=%229%22 y=%229%22 width=%225%22 height=%225%22 transform=%22rotate%2845 11.5 11.5%29%22 fill=%22%23f3c969%22 stroke=%22none%22/%3E%3C/g%3E%3C/svg%3E");
+  --orn-br: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 30 30%22 fill=%22none%22 stroke=%22%23f3c969%22 stroke-width=%221.3%22 stroke-linecap=%22round%22%3E%3Cg transform=%22matrix%28-1 0 0 -1 30 30%29%22%3E%3Cpath d=%22M1.5 29V9Q1.5 1.5 9 1.5H29%22/%3E%3Cpath d=%22M5.5 29V12Q5.5 5.5 12 5.5H29%22 stroke-opacity=%22.45%22/%3E%3Cpath d=%22M11.5 11.5l3.2 3.2M17 11.5c-3 0-5.5 2.5-5.5 5.5%22 stroke-opacity=%22.8%22/%3E%3Crect x=%229%22 y=%229%22 width=%225%22 height=%225%22 transform=%22rotate%2845 11.5 11.5%29%22 fill=%22%23f3c969%22 stroke=%22none%22/%3E%3C/g%3E%3C/svg%3E");
+  color-scheme: dark;
+  scrollbar-color: #3e2860 #08040f;
+}
+html.arcade body {
+  font-size: 15.5px;
+  background: radial-gradient(1000px 560px at 84% 2%, rgba(255, 43, 86, .16), transparent 60%),
+    radial-gradient(900px 620px at 8% -6%, rgba(120, 60, 220, .22), transparent 62%),
+    linear-gradient(180deg, #0c0520 0%, #12082e 46%, #1c0a2c 80%, #08040f 100%);
+  background-attachment: fixed;
+}
+html.arcade body::before {
+  content: ""; position: fixed; left: -50%; right: -50%; bottom: 0; height: 40vh; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255, 43, 86, .5) 2px, transparent 2px), linear-gradient(90deg, rgba(180, 107, 255, .45) 2px, transparent 2px);
+  background-size: 72px 72px;
+  transform: perspective(260px) rotateX(64deg); transform-origin: 50% 100%;
+  -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 92%); mask-image: linear-gradient(to top, #000 10%, transparent 92%);
+  opacity: .5; animation: floor 3s linear infinite;
+}
+@keyframes floor { to { background-position: 0 72px; } }
+html.arcade body::after { content: ""; position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .025) 0 1px, transparent 1px 3px); }
+html.arcade ::selection { background: var(--accent); color: #fff; }
+html.arcade :focus-visible { outline-color: var(--gold); }
+html.arcade .app { position: relative; z-index: 1; }
+html.arcade .side, html.arcade .main { position: relative; z-index: 1; }
+html.arcade .side { position: sticky; }
+@media (max-width: 819px) { html.arcade .side { position: relative; } }
+
+/* the night scene behind everything */
+html.arcade .night { display: block; position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.night::before { content: ""; position: absolute; inset: 0 0 35% 0; opacity: .7;
+  background-image: radial-gradient(1px 1px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 34% 8%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 52% 26%, #ffe9f0, transparent), radial-gradient(1px 1px at 71% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 88% 30%, #fff, transparent), radial-gradient(1.5px 1.5px at 22% 40%, #e8dcff, transparent),
+    radial-gradient(1px 1px at 63% 44%, #fff, transparent), radial-gradient(1px 1px at 6% 52%, #fff, transparent);
+  background-size: 420px 300px; }
+.night::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34vh;
+  background: linear-gradient(to top, rgba(46, 14, 70, .6), rgba(46, 14, 70, 0)); }
+.moon { position: absolute; top: 6vh; right: 7vw; width: clamp(90px, 11vw, 170px); aspect-ratio: 1; border-radius: 50%; opacity: .92;
+  background: radial-gradient(circle at 63% 58%, rgba(90, 8, 30, .32) 0 8%, transparent 9%), radial-gradient(circle at 31% 67%, rgba(90, 8, 30, .28) 0 6%, transparent 7%),
+    radial-gradient(circle at 55% 28%, rgba(90, 8, 30, .22) 0 5%, transparent 6%),
+    radial-gradient(circle at 38% 36%, #ffe9e4 0%, #ffb3a6 22%, #ff5a6e 52%, #a3123a 80%, #4d0820 100%);
+  box-shadow: 0 0 40px rgba(255, 60, 90, .55), 0 0 140px rgba(255, 43, 86, .3); }
+.castle { position: absolute; left: 0; bottom: 15vh; width: 100%; height: auto; max-height: 36vh; opacity: .8;
+  filter: drop-shadow(0 0 5px rgba(255, 43, 86, .85)) drop-shadow(0 0 20px rgba(180, 107, 255, .35)); }
+.castle .keep { fill: #0b0416; stroke: #ff2b56; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.castle .lit path { fill: #ffb347; animation: candle 3.4s ease-in-out infinite; }
+.castle .lit path:nth-child(3n) { animation-delay: -1.1s; } .castle .lit path:nth-child(3n+1) { animation-delay: -2.3s; }
+@keyframes candle { 0%, 100% { opacity: .95; } 40% { opacity: .55; } 55% { opacity: .85; } 70% { opacity: .65; } }
+.bat { position: absolute; left: 0; width: 34px; animation: fly 30s linear infinite; filter: drop-shadow(0 0 3px rgba(180, 107, 255, .75)); }
+.bat svg { display: block; width: 100%; height: auto; fill: #050208; animation: flap .32s ease-in-out infinite alternate; }
+.bat.b1 { top: 12vh; } .bat.b2 { top: 19vh; width: 26px; animation-duration: 38s; animation-delay: -14s; } .bat.b3 { top: 9vh; width: 22px; animation-duration: 45s; animation-delay: -31s; }
+@keyframes flap { to { transform: scaleY(.3); } }
+@keyframes fly { 0% { transform: translate(-6vw, 0); } 15% { transform: translate(18vw, -2vh); } 30% { transform: translate(44vw, 1.5vh); } 45% { transform: translate(72vw, -3vh); } 60%, 100% { transform: translate(108vw, -1vh); } }
+
+/* sidebar */
+html.arcade .side { background: rgba(11, 5, 21, .95); border-right: 1px solid rgba(243, 201, 105, .22); box-shadow: 1px 0 28px rgba(255, 43, 86, .12); }
+html.arcade .brand-name { font-weight: 400; font-size: 29px; line-height: 1; letter-spacing: .01em; color: #fff3f5; text-shadow: 0 0 2px #fff, 0 0 10px var(--accent), 0 0 24px var(--accent), 0 0 40px rgba(180, 107, 255, .6); }
+html.arcade .brand-sub { font-family: var(--font-pixel); font-weight: 600; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--moon); margin-top: 3px; }
+html.arcade .brand-credit { font-family: var(--font-pixel); font-weight: 600; font-size: 10.5px; letter-spacing: .06em; color: rgba(243, 201, 105, .8); }
+html.arcade .mark { filter: drop-shadow(0 0 6px rgba(255, 43, 86, .55)); }
+html.arcade .mark .bg { fill: #1a0b2a; }
+html.arcade .mark .ring { stroke: var(--gold); opacity: .7; }
+html.arcade .mark .sweep { fill: var(--accent); opacity: .45; }
+html.arcade .mark .arm { stroke: #fff; }
+html.arcade .mark .sweep, html.arcade .mark .arm { transform-box: view-box; transform-origin: 20px 20px; animation: sweep 3.2s linear infinite; }
+@keyframes sweep { to { transform: rotate(360deg); } }
+html.arcade .mark .blip { animation: blink 1.6s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+html.arcade .nav-label { font-family: var(--font-pixel); font-size: 10.5px; font-weight: 700; letter-spacing: .14em; color: var(--gold); opacity: .85; }
+html.arcade .nav button { border-radius: 2px; font-weight: 500; font-size: 15px; }
+html.arcade .nav button[aria-current="page"] { background: linear-gradient(90deg, rgba(180, 107, 255, .3), rgba(180, 107, 255, .03)); box-shadow: inset 2px 0 0 var(--magenta); }
+html.arcade .nav button[aria-current="page"] svg { color: var(--magenta); filter: drop-shadow(0 0 4px var(--magenta)); }
+html.arcade .nav .n { font-size: 20px; color: var(--moon); }
+html.arcade .status b { color: var(--gold); }
+html.arcade .side .btn { border-radius: 2px; }
+html.arcade .side .btn.primary { box-shadow: 0 0 18px rgba(255, 43, 86, .55), inset 0 0 0 1px rgba(255, 255, 255, .25); }
+html.arcade .btn.sound { border-color: rgba(243, 201, 105, .4); color: var(--gold); }
+html.arcade .btn.sound.on { color: #fff; border-color: var(--accent); box-shadow: 0 0 14px rgba(255, 43, 86, .5); }
+
+/* buttons and inputs */
+html.arcade .btn { border-radius: 2px; font-family: var(--font-pixel); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; background: rgba(16, 8, 28, .78); }
+html.arcade .btn:hover { border-color: var(--gold); box-shadow: 0 0 12px rgba(243, 201, 105, .3); }
+html.arcade .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 0 18px rgba(255, 43, 86, .55); }
+html.arcade .btn.sm { font-size: 11px; }
+html.arcade .search, html.arcade .seg, html.arcade .filters select { border-radius: 2px; background: rgba(16, 8, 28, .9); }
+html.arcade .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 16px rgba(255, 43, 86, .3); }
+html.arcade .search kbd { font-family: var(--font-num); font-size: 14px; border-color: var(--line); }
+html.arcade .seg button { font-family: var(--font-pixel); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; }
+html.arcade .seg button[aria-pressed="true"] { box-shadow: 0 0 14px rgba(255, 43, 86, .5); }
+html.arcade .count { font-family: var(--font-pixel); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+html.arcade .field input, html.arcade .field textarea, html.arcade .field select, html.arcade .letter-out { border-radius: 2px; background: #0c0617; }
+html.arcade .field input:focus, html.arcade .field textarea:focus, html.arcade .letter-out:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(255, 43, 86, .25); outline: none; }
+
+/* panels: gilded castle-window frames */
+html.arcade .ledger, html.arcade .detail, html.arcade .metrics, html.arcade .calwrap, html.arcade .boards, html.arcade .sheet {
+  background: var(--orn-tl) 4px 4px / 30px no-repeat, var(--orn-tr) calc(100% - 4px) 4px / 30px no-repeat,
+    var(--orn-bl) 4px calc(100% - 4px) / 30px no-repeat, var(--orn-br) calc(100% - 4px) calc(100% - 4px) / 30px no-repeat, var(--panel);
+  border: 1px solid rgba(243, 201, 105, .32); border-radius: 3px;
+  box-shadow: inset 0 0 0 3px rgba(8, 4, 15, .55), inset 0 0 0 4px rgba(255, 43, 86, .2), 0 0 34px rgba(120, 60, 220, .14);
+  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+}
+html.arcade .sheet { --panel: var(--surface); box-shadow: inset 0 0 0 3px rgba(8, 4, 15, .55), inset 0 0 0 4px rgba(255, 43, 86, .2), 0 0 44px rgba(255, 43, 86, .2); }
+
+/* headings and labels */
+html.arcade .topbar h1 { font-weight: 400; font-size: clamp(38px, 5vw, 60px); line-height: 1; letter-spacing: .01em; color: #fff3f5;
+  text-shadow: 0 0 2px #fff, 0 0 10px var(--accent), 0 0 26px var(--accent), 0 0 52px rgba(180, 107, 255, .65); animation: flicker 1.6s ease-out 1; }
+@keyframes flicker { 0%, 17%, 23%, 39%, 45%, 100% { opacity: 1; } 20%, 42% { opacity: .3; } }
+html.arcade .topbar .sub { font-size: 15.5px; }
+html.arcade .label, html.arcade .eyebrow, html.arcade .metric span, html.arcade .cal .m .n, html.arcade .d-sec h3, html.arcade .facts dt { font-family: var(--font-pixel); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+html.arcade .label, html.arcade .d-sec h3 { font-size: 10.5px; color: var(--gold); }
+html.arcade .eyebrow { font-size: 11px; color: var(--moon); text-shadow: 0 0 8px rgba(143, 230, 255, .45); }
+html.arcade .empty h3 { font-weight: 400; font-size: 30px; color: #fff3f5; text-shadow: 0 0 12px var(--accent); }
+html.arcade .sheet-head h2 { font-family: var(--font-pixel); font-weight: 600; }
+html.arcade .upload { border-color: rgba(243, 201, 105, .45); border-radius: 2px; background: rgba(243, 201, 105, .04); }
+html.arcade .upload b { font-family: var(--font-pixel); font-weight: 700; letter-spacing: .04em; color: var(--gold); }
+html.arcade .upload.drag { border-color: var(--accent); background: var(--accent-soft); }
+
+/* status numbers */
+html.arcade .metric b { font-family: var(--font-num); font-weight: 400; font-size: 52px; line-height: .85; color: var(--moon); text-shadow: 0 0 12px rgba(143, 230, 255, .55); }
+html.arcade .metric:nth-child(2) b { color: var(--accent); text-shadow: 0 0 12px rgba(255, 43, 86, .6); }
+html.arcade .metric.warn b { color: var(--urgent); text-shadow: 0 0 12px rgba(255, 179, 71, .55); }
+html.arcade .metric:last-child b { color: var(--magenta); text-shadow: 0 0 12px rgba(180, 107, 255, .6); }
+html.arcade .metric span { font-size: 9.5px; }
+
+/* start-month strip as a castle map */
+html.arcade .cal { gap: 3px; }
+html.arcade .cal .m { border-radius: 0; background: #1b2a8c; box-shadow: inset 0 0 0 2px #b9c6ff; padding: 6px 2px 5px; }
+html.arcade .cal .m.zero { background: rgba(20, 14, 40, .6); box-shadow: inset 0 0 0 1px rgba(185, 198, 255, .22); }
+html.arcade .cal .m.win { background: #b0122f; box-shadow: inset 0 0 0 2px #ff9fb0, 0 0 12px rgba(255, 43, 86, .45); }
+html.arcade .cal .m.win.zero { background: rgba(176, 18, 47, .22); box-shadow: inset 0 0 0 1px rgba(255, 159, 176, .55); }
+html.arcade .cal .m .c { font-family: var(--font-num); font-size: 24px; font-weight: 400; line-height: 1; color: #fff; }
+html.arcade .cal .m.zero .c { color: var(--muted); }
+html.arcade .cal .m .n { font-size: 8.5px; color: rgba(255, 255, 255, .8); letter-spacing: .06em; }
+html.arcade .cal-key span::before { background: #b0122f; box-shadow: inset 0 0 0 1.5px #ff9fb0; border-radius: 0; }
+html.arcade .cal-key .k-room { display: inline; }
+html.arcade .cal-key .k-room::before { background: #1b2a8c; box-shadow: inset 0 0 0 1.5px #b9c6ff; }
+
+/* role list */
+html.arcade .row:hover { background: rgba(180, 107, 255, .07); }
+html.arcade .row[aria-current="true"] { background: linear-gradient(90deg, rgba(255, 43, 86, .22), rgba(255, 43, 86, .02) 75%); box-shadow: inset 2px 0 0 var(--accent); }
+html.arcade .row[aria-current="true"] .row-title::before { content: "❧"; color: var(--accent); margin-right: 7px; text-shadow: 0 0 8px var(--accent); animation: blink 1.1s steps(2, start) infinite; }
+html.arcade .row-title { font-weight: 600; font-size: 16px; }
+html.arcade .row.dim { opacity: .5; filter: saturate(.35); }
+html.arcade .logo { border-radius: 50% 50% 3px 3px / 38% 38% 3px 3px; font-family: var(--font-pixel); font-weight: 700; font-size: 16px;
+  background: linear-gradient(180deg, hsl(var(--h) 60% 24%), hsl(var(--h) 60% 9%)); color: hsl(var(--h) 95% 80%);
+  box-shadow: inset 0 0 0 1px hsl(var(--h) 90% 65% / .65), 0 0 12px hsl(var(--h) 90% 60% / .25); }
+html.arcade .pay { font-weight: 400; color: var(--gold); text-shadow: 0 0 10px rgba(243, 201, 105, .5); }
+html.arcade .row .pay { font-size: 24px; }
+html.arcade .pay small { font-family: var(--font-body); font-size: 11.5px; text-shadow: none; }
+html.arcade .due { border-radius: 2px; font-family: var(--font-pixel); font-weight: 700; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; background: rgba(31, 18, 51, .9); }
+html.arcade .due.soon { color: var(--urgent); background: var(--urgent-soft); box-shadow: inset 0 0 0 1px rgba(255, 179, 71, .5), 0 0 10px rgba(255, 179, 71, .3); }
+html.arcade .due.none { background: transparent; }
+html.arcade .chip { border-radius: 2px; font-family: var(--font-pixel); font-weight: 700; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; background: rgba(31, 18, 51, .9); }
+html.arcade .chip.new { background: var(--accent); color: #fff; box-shadow: 0 0 10px rgba(255, 43, 86, .6); }
+html.arcade .chip.mark { background: transparent; color: var(--moon); box-shadow: inset 0 0 0 1px rgba(143, 230, 255, .55); }
+html.arcade .chip.ok { background: transparent; color: var(--magenta); box-shadow: inset 0 0 0 1px rgba(180, 107, 255, .65); }
+html.arcade .chip.int { background: var(--urgent); color: #1a0f00; box-shadow: 0 0 10px rgba(255, 179, 71, .5); }
+html.arcade .chip.no { background: transparent; color: var(--danger); box-shadow: inset 0 0 0 1px rgba(255, 95, 126, .55); }
+
+/* role card */
+html.arcade .detail h2 { font-family: var(--font-pixel); font-weight: 600; font-size: clamp(21px, 2.3vw, 28px); line-height: 1.2; color: #fff; text-shadow: 0 0 14px rgba(180, 107, 255, .4); }
+html.arcade .d-pay { border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(243, 201, 105, .4); }
+html.arcade .d-pay .pay { font-size: 52px; line-height: .85; }
+html.arcade .facts { border-top: 1px solid rgba(243, 201, 105, .22); }
+html.arcade .facts dt { font-size: 10px; padding-top: 4px; }
+html.arcade .track button { border-radius: 2px; font-family: var(--font-pixel); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 10.5px; background: rgba(16, 8, 28, .78); }
+html.arcade .track button:hover { border-color: var(--gold); color: var(--ink); }
+html.arcade .track button[aria-pressed="true"] { color: #0b0510; border-color: transparent; }
+html.arcade .track [data-act="saved"][aria-pressed="true"] { background: var(--moon); box-shadow: 0 0 12px rgba(143, 230, 255, .55); }
+html.arcade .track [data-act="applied"][aria-pressed="true"] { background: var(--magenta); box-shadow: 0 0 12px rgba(180, 107, 255, .6); }
+html.arcade .track [data-act="interview"][aria-pressed="true"] { background: var(--urgent); box-shadow: 0 0 12px rgba(255, 179, 71, .55); }
+html.arcade .track [data-act="rejected"][aria-pressed="true"] { background: var(--danger); box-shadow: 0 0 12px rgba(255, 95, 126, .55); }
+html.arcade .track [data-act="hidden"][aria-pressed="true"] { background: #7a6a92; }
+html.arcade .links a { border-radius: 2px; background: rgba(16, 8, 28, .9); color: var(--moon); }
+html.arcade .links a:hover { border-color: var(--gold); box-shadow: 0 0 12px rgba(243, 201, 105, .3); }
+html.arcade .toast { background: #120820; color: var(--ink); border: 1px solid var(--gold); border-radius: 2px; box-shadow: 0 0 18px rgba(255, 43, 86, .35); }
+/* phones: pay and deadline drop under the title so long titles keep their width */
+@media (max-width: 560px) {
+  .row { grid-template-columns: 40px minmax(0, 1fr); }
+  .row-side { grid-column: 2; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 6px 10px; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.arcade body::before, html.arcade .mark .sweep, html.arcade .mark .arm, html.arcade .mark .blip, html.arcade .topbar h1,
+  html.arcade .row[aria-current="true"] .row-title::before, .castle .lit path { animation: none; }
+  .bat { display: none; }
+}
+.nav [data-view="letters"]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap app">
+  <div class="night" aria-hidden="true">
+    <div class="moon"></div>
+    <svg class="castle" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax meet"><path class="keep" d="M0 260 L0 214 L12 214 L12 205 L24 205 L24 214 L36 214 L36 205 L48 205 L48 214 L58 214 L58 134 L54 134 L54 128 L79 62 L104 128 L104 134 L100 134 L100 182 L112 182 L112 173 L124 173 L124 182 L136 182 L136 173 L148 173 L148 182 L160 182 L160 173 L172 173 L172 182 L176 182 L176 110 L172 110 L172 104 L199 30 L226 104 L226 110 L222 110 L222 160 L234 160 L234 151 L246 151 L246 160 L258 160 L258 151 L270 151 L270 160 L282 160 L282 151 L294 151 L294 160 L306 160 L306 151 L318 151 L318 160 L318 102 L314 102 L314 96 L332 34 L350 96 L350 102 L346 102 L346 118 L372 118 L372 92 L398 30 L400 4 L402 30 L428 92 L428 118 L454 118 L454 102 L450 102 L450 96 L468 34 L486 96 L486 102 L482 102 L482 168 L494 168 L494 159 L506 159 L506 168 L518 168 L518 159 L530 159 L530 168 L542 168 L542 159 L554 159 L554 168 L566 168 L566 118 L562 118 L562 112 L585 52 L608 112 L608 118 L604 118 L604 150 L758 150 L758 68 L754 68 L754 62 L782 8 L810 62 L810 68 L806 68 L806 176 L818 176 L818 167 L830 167 L830 176 L842 176 L842 167 L854 167 L854 176 L866 176 L866 167 L878 167 L878 176 L890 176 L890 167 L896 167 L896 176 L896 132 L892 132 L892 126 L918 74 L944 126 L944 132 L940 132 L940 194 L952 194 L952 185 L964 185 L964 194 L976 194 L976 185 L988 185 L988 194 L1000 194 L1000 185 L1012 185 L1012 194 L1024 194 L1024 185 L1036 185 L1036 194 L1048 194 L1048 185 L1058 185 L1058 194 L1058 152 L1054 152 L1054 146 L1076 102 L1098 146 L1098 152 L1094 152 L1094 214 L1106 214 L1106 205 L1118 205 L1118 214 L1130 214 L1130 205 L1142 205 L1142 214 L1154 214 L1154 205 L1166 205 L1166 214 L1178 214 L1178 205 L1190 205 L1190 214 L1200 214 L1200 260 Z"></path><g class="lit"><path d="M73 168 V155 Q78 146.5 83 155 V168 Z"></path><path d="M196 144 V132.5 Q200.5 124.9 205 132.5 V144 Z"></path><path d="M196 174 V164.5 Q200.5 156.9 205 164.5 V174 Z"></path><path d="M332 138 V128 Q336 121.2 340 128 V138 Z"></path><path d="M392 158 V138 Q400 124.4 408 138 V158 Z"></path><path d="M466 138 V128 Q470 121.2 474 128 V138 Z"></path><path d="M580 150 V138.5 Q584.5 130.9 589 138.5 V150 Z"></path><path d="M624 186 V172 Q628 165.2 632 172 V186 Z"></path><path d="M652 186 V172 Q656 165.2 660 172 V186 Z"></path><path d="M680 186 V172 Q684 165.2 688 172 V186 Z"></path><path d="M708 186 V172 Q712 165.2 716 172 V186 Z"></path><path d="M736 186 V172 Q740 165.2 744 172 V186 Z"></path><path d="M776 108 V94 Q782 83.8 788 94 V108 Z"></path><path d="M776 140 V130 Q782 119.8 788 130 V140 Z"></path><path d="M913 163 V152.5 Q917.5 144.9 922 152.5 V163 Z"></path><path d="M1070 179 V170 Q1074 163.2 1078 170 V179 Z"></path></g></svg>
+    <span class="bat b1"><svg viewBox="0 0 40 16"><path d="M20 6C17 3 13 1 8 2C9 4 8 5 6 5C5 3 2 3 0 6C3 6 5 8 6 10C8 8 11 8 13 10C15 8 17 9 20 12C23 9 25 8 27 10C29 8 32 8 34 10C35 8 37 6 40 6C38 3 35 3 34 5C32 5 31 4 32 2C27 1 23 3 20 6ZM18.6 5.5L19 2.6L20 4.2L21 2.6L21.4 5.5Z"></path></svg></span>
+    <span class="bat b2"><svg viewBox="0 0 40 16"><path d="M20 6C17 3 13 1 8 2C9 4 8 5 6 5C5 3 2 3 0 6C3 6 5 8 6 10C8 8 11 8 13 10C15 8 17 9 20 12C23 9 25 8 27 10C29 8 32 8 34 10C35 8 37 6 40 6C38 3 35 3 34 5C32 5 31 4 32 2C27 1 23 3 20 6ZM18.6 5.5L19 2.6L20 4.2L21 2.6L21.4 5.5Z"></path></svg></span>
+    <span class="bat b3"><svg viewBox="0 0 40 16"><path d="M20 6C17 3 13 1 8 2C9 4 8 5 6 5C5 3 2 3 0 6C3 6 5 8 6 10C8 8 11 8 13 10C15 8 17 9 20 12C23 9 25 8 27 10C29 8 32 8 34 10C35 8 37 6 40 6C38 3 35 3 34 5C32 5 31 4 32 2C27 1 23 3 20 6ZM18.6 5.5L19 2.6L20 4.2L21 2.6L21.4 5.5Z"></path></svg></span>
+  </div>
+  <aside class="side" aria-label="Board navigation">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+        <rect class="bg" width="40" height="40" rx="10"></rect>
+        <path class="sweep" d="M20 20 L20 4 A16 16 0 0 1 33.1 10.8 Z"></path>
+        <circle class="ring" cx="20" cy="20" r="6"></circle><circle class="ring" cx="20" cy="20" r="11"></circle><circle class="ring" cx="20" cy="20" r="16"></circle>
+        <path class="arm" d="M20 20 L33.1 10.8"></path>
+        <circle class="blip" cx="25.5" cy="10.5" r="2.3"></circle>
+      </svg>
+      <div>
+        <div class="brand-name">Co-op Radar</div>
+        <div class="brand-sub">MScSM · Summer 2027</div>
+      </div>
+      <div class="brand-credit">Made by witheringtodeath_</div>
+    </div>
+
+    <nav class="nav" aria-label="Views">
+      <div class="nav-label">Roles</div>
+      <button type="button" data-view="open" aria-current="page"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h10M3 8h10M3 12h6"></path></svg>Open roles<span class="n">14</span></button>
+      <div class="nav-label">My search</div>
+      <button type="button" data-view="saved" aria-current="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5h7v11l-3.5-2.5-3.5 2.5z"></path></svg>Saved<span class="n"></span></button>
+      <button type="button" data-view="applied" aria-current="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="5.5"></circle><path d="M5.6 8.2l1.7 1.8 3.2-3.6"></path></svg>Applied<span class="n"></span></button>
+      <button type="button" data-view="interview" aria-current="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 3.5h11v7H7.5l-3 2.5v-2.5h-2z"></path><path d="M5.5 6.5h5M5.5 8.5h3"></path></svg>Interviews<span class="n"></span></button>
+      <button type="button" data-view="rejected" aria-current="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="5.5"></circle><path d="M6 6l4 4M10 6l-4 4"></path></svg>Not selected<span class="n"></span></button>
+      <button type="button" data-view="letters" aria-current="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2.5h5.5L12 5v8.5H4z"></path><path d="M6 8h4M6 10.5h4"></path></svg>Cover letters<span class="n"></span></button>
+      <button type="button" id="profileBtn" hidden=""><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5.5" r="2.5"></circle><path d="M3 13.5c.8-2.6 2.8-3.8 5-3.8s4.2 1.2 5 3.8"></path></svg>My info</button>
+      <div class="nav-label">Archive</div>
+      <button type="button" data-view="hidden" aria-current="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8s2.2-4 6-4 6 4 6 4-2.2 4-6 4-6-4-6-4z"></path><path d="M3 13L13 3"></path></svg>Hidden<span class="n"></span></button>
+      <button type="button" data-view="closed" aria-current="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="3" width="11" height="3" rx="1"></rect><path d="M3.5 6v7h9V6M6.5 8.5h3"></path></svg>Closed<span class="n">4</span></button>
+      <div class="nav-label">More</div>
+      <button type="button" data-view="boards" aria-current="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="5.5"></circle><path d="M2.5 8h11M8 2.5c1.8 1.8 1.8 9.2 0 11M8 2.5c-1.8 1.8-1.8 9.2 0 11"></path></svg>Job boards</button>
+    </nav>
+
+    <div class="side-foot">
+      <div class="status" id="runStatus">Last refreshed <b>Nov 27, 2:40 PM</b> · 1 new, 0 closed<br>New: Kiewit Jr. Project Coordinator co-op on the Darlington SMR site ($21–26/hr, Winter 2027). Mott MacDonald climate internship still closes Nov 30.<br>Refreshing works when the board is open in Claude.</div>
+      <button class="btn primary" id="refreshBtn" type="button" disabled=""><span id="refreshIcon" hidden="" class="spin"></span><span id="refreshLabel">Refresh</span></button>
+      <div class="side-tools">
+        <button class="btn" id="skinBtn" type="button">Classic look</button>
+        <button class="btn" id="installBtn" type="button" hidden="">Install on Mac</button>
+        <button class="btn" id="notifyBtn" type="button" hidden="">Turn on notifications</button>
+        <button class="btn" id="saveCsv" type="button">Export .csv</button>
+        <button class="btn" id="saveHtml" type="button">Save offline copy</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="viewTitle">Open roles</h1>
+        <p class="sub" id="viewSub">Paid sustainability internships and co-ops in the GTA and remote in Canada, aimed at the May–August 2027 work term.</p>
+      </div>
+      <div class="top-tools">
+        <label class="search">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+          <input type="search" id="fText" placeholder="Search employer, title, tag" aria-label="Search roles">
+          <kbd>/</kbd>
+        </label>
+        <button class="btn" id="exportBtn" type="button" title="Every role on the board with all its details and your status, as an Excel workbook"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v7.5M4.8 7l3.2 3.2L11.2 7M3 12.5h10"></path></svg>Export list</button>
+        <button type="button" class="btn sound" id="soundBtn" aria-pressed="false" aria-label="Play music" title="Play music"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5h3l4-3.5v12l-4-3.5h-3z" fill="currentColor" fill-opacity=".15"></path><path class="wave" d="M13.5 7.2a4 4 0 0 1 0 5.6M15.8 5a7 7 0 0 1 0 10"></path><path class="mute" d="M13.5 8l4 4M17.5 8l-4 4"></path></svg></button>
+      </div>
+    </header>
+
+    <section class="overview" id="overview" aria-label="Summary">
+      <div class="metrics" id="stats">
+        <div class="metric"><b class="num">14</b><span>open paid roles</span></div>
+        <div class="metric"><b class="num">4</b><span>start in summer 2027</span></div>
+        <div class="metric warn"><b class="num">2</b><span>close within 14 days</span></div>
+        <div class="metric"><b class="num">0</b><span>applied</span></div>
+      </div>
+      <div class="calwrap">
+        <div class="label">Open roles by start month</div>
+        <div class="cal" id="cal" aria-label="Open roles by start month"><div class="m zero" title="0 roles starting Nov 2026"><span class="c">0</span><span class="n">Nov</span></div><div class="m zero" title="0 roles starting Dec 2026"><span class="c">0</span><span class="n">Dec</span></div><div class="m" title="5 roles starting Jan 2027"><span class="c">5</span><span class="n">Jan 27</span></div><div class="m zero" title="0 roles starting Feb 2027"><span class="c">0</span><span class="n">Feb</span></div><div class="m zero" title="0 roles starting Mar 2027"><span class="c">0</span><span class="n">Mar</span></div><div class="m zero" title="0 roles starting Apr 2027"><span class="c">0</span><span class="n">Apr</span></div><div class="m win" title="2 roles starting May 2027"><span class="c">2</span><span class="n">May</span></div><div class="m win" title="1 role starting Jun 2027"><span class="c">1</span><span class="n">Jun</span></div><div class="m win zero" title="0 roles starting Jul 2027"><span class="c">0</span><span class="n">Jul</span></div><div class="m win zero" title="0 roles starting Aug 2027"><span class="c">0</span><span class="n">Aug</span></div><div class="m zero" title="0 roles starting Sep 2027"><span class="c">0</span><span class="n">Sep</span></div><div class="m" title="Start not listed or flexible"><span class="c">6</span><span class="n">Flex</span></div></div>
+        <div class="cal-key small"><span class="k-room">Has open roles</span><span>MScSM internship window (SSM1110H, May–Aug)</span></div>
+      </div>
+    </section>
+
+    <section class="filters" id="filters" aria-label="Filters">
+      <div class="seg" role="group" aria-label="Start">
+        <button type="button" id="fTermSummer" data-term="summer" aria-pressed="false">Summer 2027</button>
+        <button type="button" id="fTermEarlier" data-term="earlier" aria-pressed="false">Before summer</button>
+        <button type="button" id="fTermAny" data-term="any" aria-pressed="true">Any start</button>
+      </div>
+      <select id="fType" aria-label="Role type"><option value="">Internship + co-op</option><option value="Internship">Internships</option><option value="Co-op">Co-ops</option></select>
+      <select id="fMode" aria-label="Work mode"><option value="">Any work mode</option><option value="Remote">Remote</option><option value="Hybrid">Hybrid</option><option value="On-site">On-site</option></select>
+      <select id="fSort" aria-label="Sort"><option value="due">Closing soonest</option><option value="pay">Highest pay</option><option value="new">Newest found</option></select>
+      <span class="count" id="count">14 shown</span>
+    </section>
+
+    <div class="work" id="work">
+      <section class="ledger" id="list" aria-label="Roles" aria-live="polite"></section>
+      <aside class="detail" id="detail" aria-label="Role details" data-id="p-mott-macdonald-graduate-climate-sustainability-specialist-2027"></aside>
+    </div>
+    <div class="detail-scrim" id="detailScrim"></div>
+
+    <section class="boards" id="boards" hidden="">
+      <p class="small" style="margin:0">Refresh reads public job pages and employer career sites. It never signs in to LinkedIn and skips Indeed, so check LinkedIn directly too, and confirm pay on each posting.</p>
+      <div class="links">
+        <a href="https://www.linkedin.com/jobs/search/?keywords=sustainability%20intern&amp;location=Toronto%2C%20Ontario%2C%20Canada&amp;f_JT=I" target="_blank" rel="noopener">LinkedIn: sustainability internships, Toronto</a>
+        <a href="https://www.linkedin.com/jobs/search/?keywords=ESG%20co-op&amp;location=Canada&amp;f_WT=2" target="_blank" rel="noopener">LinkedIn: ESG co-op, remote Canada</a>
+        <a href="https://app.energyhire.com/job-board" target="_blank" rel="noopener">EnergyHire: Ontario energy jobs</a>
+        <a href="https://jobs.opg.com/" target="_blank" rel="noopener">Ontario Power Generation careers</a>
+        <a href="https://www.eluta.ca/search?q=sustainability+intern&amp;l=Toronto" target="_blank" rel="noopener">Eluta</a>
+        <a href="https://goodwork.ca/" target="_blank" rel="noopener">GoodWork.ca</a>
+        <a href="https://eco.ca/" target="_blank" rel="noopener">ECO Canada</a>
+        <a href="https://charityvillage.com/" target="_blank" rel="noopener">CharityVillage</a>
+        <a href="https://www.gojobs.gov.on.ca/" target="_blank" rel="noopener">Ontario Public Service</a>
+        <a href="https://www.canada.ca/en/public-service-commission/jobs/services/recruitment/students/federal-student-work-program.html" target="_blank" rel="noopener">Federal Student Work Experience Program</a>
+        <a href="https://jobs.toronto.ca/" target="_blank" rel="noopener">City of Toronto jobs</a>
+        <a href="https://sustainability.utoronto.ca/catalyst" target="_blank" rel="noopener">U of T Sustainability Catalyst</a>
+        <a href="https://www.mitacs.ca/our-programs/business-strategy-internship-students-postdocs/" target="_blank" rel="noopener">Mitacs Business Strategy Internship</a>
+      </div>
+      <p class="foot">Only roles that state pay, or say plainly that they are paid, are kept. Pay is converted to an hourly figure for sorting (yearly ÷ 2,080 hours, monthly ÷ 173). Deadlines and details come from each posting on the day it was found, so check the posting before you apply.</p>
+    </section>
+  </main>
+
+  <div class="scrim" id="letterDlg" hidden="">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ldTitle">
+      <div class="sheet-head">
+        <div style="min-width:0">
+          <div class="label">Cover letter</div>
+          <h2 id="ldTitle">Role</h2>
+          <div class="org" id="ldOrg"></div>
+        </div>
+        <button class="x" id="ldClose" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="notice" id="ldNeedInfo" hidden=""><span>Add your details once and every letter uses them.</span><button class="btn sm" id="ldAddInfo" type="button">Add my info</button></div>
+      <div class="fields">
+        <div class="field">
+          <label for="ldLength">Length</label>
+          <select id="ldLength"><option value="250">Short, about 250 words</option><option value="350" selected="">Standard, about 350 words</option><option value="450">Long, about 450 words</option></select>
+        </div>
+        <div class="field">
+          <label for="ldEmph">Anything to stress (optional)</label>
+          <input id="ldEmph" type="text" maxlength="400" placeholder="A project, course or reason for this employer">
+        </div>
+        <details class="paste wide" id="ldPasteBox">
+          <summary>Paste the job posting (optional, gives a sharper letter)</summary>
+          <div class="field" style="margin-top:8px">
+            <textarea id="ldPosting" rows="6" aria-label="Job posting text"></textarea>
+            <span class="hint">Without it, Claude only sees the short description on this board.</span>
+          </div>
+        </details>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn primary" id="ldGo" type="button">Write letter</button>
+        <button class="btn" id="ldStop" type="button" hidden="">Stop</button>
+        <span class="note grow" id="ldStatus" aria-live="polite"></span>
+      </div>
+      <textarea class="letter-out" id="ldText" aria-label="Cover letter text" placeholder="Your letter appears here. You can edit it directly, and changes save as you type."></textarea>
+      <div class="sheet-foot">
+        <button class="btn" id="ldCopy" type="button">Copy</button>
+        <button class="btn" id="ldPdf" type="button" hidden="">Download .pdf</button>
+        <button class="btn" id="ldDocx" type="button" hidden="">Download .docx</button>
+        <button class="btn" id="ldTxt" type="button" hidden="">Download .txt</button>
+        <span class="note grow" id="ldSaved"></span>
+      </div>
+      <p class="note">Claude writes only from your info and this role's details. Read it through and check every claim before you send it.</p>
+    </div>
+  </div>
+
+  <div class="scrim" id="profileDlg" hidden="">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pfTitle">
+      <div class="sheet-head">
+        <div>
+          <div class="label">Used in every cover letter</div>
+          <h2 id="pfTitle">My info</h2>
+        </div>
+        <button class="x" id="pfClose" type="button" aria-label="Close">×</button>
+      </div>
+      <p class="note" id="pfWhere">Saved privately to your Claude account. Nobody else who opens this board can see it.</p>
+      <div class="upload" id="pfUpload">
+        <div class="grow"><b>Start from your résumé</b><span class="note" id="pfUpNote" aria-live="polite">Upload or drop a PDF or Word file. Its text goes into the résumé field and Claude fills in any empty fields. Check everything before you save.</span></div>
+        <button class="btn" id="pfUpBtn" type="button">Upload résumé</button>
+        <input type="file" id="pfFile" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" hidden="">
+      </div>
+      <form id="pfForm" class="fields" novalidate="">
+        <div class="field"><label for="pf_fullName">Full name</label><input id="pf_fullName" type="text" autocomplete="name" maxlength="120"></div>
+        <div class="field"><label for="pf_email">Email</label><input id="pf_email" type="email" autocomplete="email" maxlength="160"></div>
+        <div class="field"><label for="pf_phone">Phone</label><input id="pf_phone" type="tel" autocomplete="tel" maxlength="40"></div>
+        <div class="field"><label for="pf_city">City</label><input id="pf_city" type="text" maxlength="80"></div>
+        <div class="field wide"><label for="pf_linkedin">LinkedIn or portfolio link</label><input id="pf_linkedin" type="url" maxlength="300" placeholder="https://www.linkedin.com/in/…"></div>
+        <div class="label group-label">Studies</div>
+        <div class="field wide"><label for="pf_program">Program</label><input id="pf_program" type="text" maxlength="200"></div>
+        <div class="field"><label for="pf_gradDate">Expected graduation</label><input id="pf_gradDate" type="text" maxlength="60" placeholder="e.g. December 2027"></div>
+        <div class="field"><label for="pf_availability">Availability</label><input id="pf_availability" type="text" maxlength="160"></div>
+        <div class="label group-label">Background</div>
+        <div class="field wide"><label for="pf_background">Previous degrees</label><textarea id="pf_background" rows="2" maxlength="1500"></textarea><span class="hint">Degree, school and year, plus anything notable such as a thesis topic.</span></div>
+        <div class="field wide"><label for="pf_skills">Skills and tools</label><textarea id="pf_skills" rows="3" maxlength="2000"></textarea><span class="hint">Methods, standards and software you have actually used, such as GHG Protocol, GRI, Excel, Power BI or ArcGIS.</span></div>
+        <div class="field wide"><label for="pf_experience">Experience</label><textarea id="pf_experience" rows="6" maxlength="12000"></textarea><span class="hint">Jobs, internships, course projects and volunteer work, one per line, with what you did and any result.</span></div>
+        <div class="field wide"><label for="pf_goals">What you want from a placement</label><textarea id="pf_goals" rows="2" maxlength="1500"></textarea></div>
+        <div class="field wide"><label for="pf_resume">Résumé text (optional)</label><textarea id="pf_resume" rows="7" maxlength="30000"></textarea><span class="hint" id="pfResumeHint">Upload your résumé above or paste it here, and Claude will draw on it too.</span></div>
+        <div class="field"><label for="pf_signoff">Sign-off</label><input id="pf_signoff" type="text" maxlength="40"></div>
+      </form>
+      <div class="sheet-foot">
+        <span class="note grow" id="pfStatus" aria-live="polite"></span>
+        <button class="btn" id="pfCancel" type="button">Cancel</button>
+        <button class="btn primary" id="pfSave" type="submit" form="pfForm">Save my info</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script>window.RADAR_SNAPSHOT = {"takenAt":"2026-11-27T20:31:39.824Z","run":{"added":1,"closed":0,"finishedAt":"2026-11-27T19:40:40Z","note":"New: Kiewit Jr. Project Coordinator co-op on the Darlington SMR site ($21–26/hr, Winter 2027). Mott MacDonald climate internship still closes Nov 30.","startedAt":"2026-11-27T19:27:51Z","state":"done","updated":6},"postings":[{"id":"p-arcadis-environmental-planner-intern-co-op","applyUrl":"https://ecoworks.eco.ca/jobs/626834309/apply","deadline":"","durationMonths":4,"eligibility":"Open – current Bachelor's or Master's students in environmental planning, environmental science, urban planning, geography or related","employer":"Arcadis","firstSeen":"2026-11-20T03:33:44Z","fit":"Hands-on environmental assessment and compliance experience at a major consultancy that explicitly accepts master's students.","lastSeen":"2026-11-27T19:40:22Z","location":"Markham, ON","pay":"The salary range for this position is $20-$32 per hour.","payHourlyMax":32,"payHourlyMin":20,"postedDate":"","source":"ECO Canada","startMonth":"2027-01","status":"open","summary":"Assists with desktop environmental reviews, permitting and regulatory-compliance support, environmental assessments and technical reports, with occasional fieldwork.","tags":["Environmental compliance","Consulting","Policy"],"term":"Winter 2027 (Jan start, 4 or 8 months)","title":"Environmental Planner Intern/Co-op","type":"Co-op","workMode":"On-site"},{"id":"p-celestica-student-intern-corporate-sustainability","applyUrl":"https://careers.celestica.com/talentcommunity/apply/1454470533/?locale=en_US","deadline":"","durationMonths":16,"eligibility":"Open – 3rd/4th-year undergrad or Masters internship-program students in engineering, environmental studies, business or sciences; transcript required","employer":"Celestica","firstSeen":"2026-11-20T03:33:44Z","fit":"Corporate sustainability reporting and data work at a global manufacturer that accepts master's students, though the 16-month length is long.","lastSeen":"2026-11-26T15:21:54Z","location":"Toronto, ON","pay":"Hourly Wage: $23-30 CAD/hr","payHourlyMax":30,"payHourlyMin":23,"postedDate":"2026-11-04","source":"Company site","startMonth":"","status":"open","summary":"Consolidates, analyzes and reports sustainability performance metrics, supports sustainability data software and helps run corporate sustainability initiatives across global sites.","tags":["Reporting","ESG","Data"],"term":"16 months (posting lists start as May 2026 – confirm with employer)","title":"Student Intern, Corporate Sustainability","type":"Internship","workMode":"Hybrid"},{"id":"p-csa-group-standards-intern","applyUrl":"https://csa.wd10.myworkdayjobs.com/en-US/csa/job/Toronto/Standards-Intern_R004947","deadline":"","durationMonths":null,"eligibility":"Requires a completed undergraduate degree; listed as Regular full-time, so confirm it can work as an MScSM placement","employer":"CSA Group","firstSeen":"2026-11-26T15:39:17Z","fit":"Energy-efficiency and renewables standards work at Canada's national standards body, mixing policy, stakeholder engagement and technical research.","lastSeen":"2026-11-26T15:39:17Z","location":"Toronto, ON","pay":"The typical hiring range for this position is $67,970–$89,208 CAD gross annually.","payHourlyMax":42.89,"payHourlyMin":32.68,"postedDate":"2026-11-24","source":"Company site (via LinkedIn)","startMonth":"","status":"open","summary":"Supports CSA's Electrical standards sector on energy efficiency and renewables through standards research, committee coordination and drafting new standards.","tags":["Energy","Renewables","Standards","Policy"],"term":"Not stated (listed as a regular full-time role, no end date given)","title":"Standards Intern","type":"Internship","workMode":""},{"id":"p-dexterra-group-sustainability-coordinator-co-op-student","applyUrl":"https://ca.indeed.com/viewjob?jk=db62f34f388dced0","deadline":"","durationMonths":4,"eligibility":"Open – college or university students in Environmental Studies, Sustainability, Business, Public Policy or related, returning to studies after the term","employer":"Dexterra Group","firstSeen":"2026-11-26T04:43:37Z","fit":"Hands-on GHG tracking and ESG reporting work that maps directly onto MScSM coursework, with a remote or hybrid setup.","lastSeen":"2026-11-26T15:21:54Z","location":"Remote (Canada) – Mississauga, ON office optional","pay":"$20 an hour","payHourlyMax":20,"payHourlyMin":20,"postedDate":"","source":"Indeed","startMonth":"2027-01","status":"open","summary":"Supports corporate sustainability programs on energy reduction, waste diversion and sustainable procurement, tracks GHG and waste data, and helps with ESG reporting.","tags":["ESG","Carbon accounting","Reporting","Circular economy"],"term":"Winter 2027 (Jan–Apr, 16 weeks) or Jan–Aug (32 weeks) – year not stated on posting","title":"Sustainability Coordinator Co-op Student","type":"Co-op","workMode":"Remote"},{"id":"p-edf-power-solutions-intern-canada-and-north-east-development-summer","applyUrl":"https://caenglish-edf-re.icims.com/jobs/5150/intern---canada-and-north-east-development---summer-2027-[hybrid]/job","deadline":"","durationMonths":4,"eligibility":"Open – current Bachelor's or graduate students in business, science, renewable energy, engineering or related","employer":"EDF power solutions","firstSeen":"2026-11-20T03:33:44Z","fit":"Energy-transition project development mixing stakeholder engagement and business analysis, open to graduate students.","lastSeen":"2026-11-27T19:40:22Z","location":"Toronto, ON","pay":"The full pay range for this role is $17.95 to $27.55 hourly, and the good faith estimated starting pay for this position upon hire is $22.00 to $32.00 hourly.","payHourlyMax":32,"payHourlyMin":22,"postedDate":"","source":"Company site","startMonth":"2027-05","status":"open","summary":"Supports development of wind, solar and battery-storage projects in Canada and the US Northeast, including permitting, GIS site screening, PPA and financial analysis, and community engagement.","tags":["Energy","Renewables","Project development"],"term":"Summer 2027 (May–Aug)","title":"Intern - Canada and North East Development - Summer 2027 [Hybrid]","type":"Internship","workMode":"Hybrid"},{"id":"p-edf-power-solutions-intern-canada-and-north-east-development-winter","applyUrl":"https://caenglish-edf-re.icims.com/jobs/5149/intern---canada-and-north-east-development--winter-2027-%5bhybrid%5d/job","deadline":"","durationMonths":4,"eligibility":"Open – undergraduate or graduate students","employer":"EDF power solutions","firstSeen":"2026-11-20T03:33:44Z","fit":"A January start in renewable-energy development that accepts master's students.","lastSeen":"2026-11-20T03:50:23Z","location":"Toronto, ON","pay":"The full pay range for this role is $17.95 to $27.55 hourly; the good faith estimated starting pay for this position upon hire is $22.00 to $32.00 hourly","payHourlyMax":32,"payHourlyMin":22,"postedDate":"","source":"Company site","startMonth":"2027-01","status":"closed","summary":"Renewable project development support (wind, solar and storage permitting, GIS siting, PPA economics and community responses) from the downtown Toronto office at least 3 days a week.","tags":["Energy","Renewables","Project development"],"term":"Winter 2027 (Jan–Apr)","title":"Intern - Canada and North East Development - Winter 2027 [Hybrid]","type":"Internship","workMode":"Hybrid"},{"id":"p-gfl-environmental-project-coordinator-co-op","applyUrl":"https://www.linkedin.com/jobs/view/4490989992/","deadline":"","durationMonths":8,"eligibility":"Must be enrolled in a post-secondary co-op program (project management, change management, business or related); GFL's earlier 4-month version of this role was limited to Canadian citizens, PR and protected persons","employer":"GFL Environmental","firstSeen":"2026-11-26T15:44:36Z","fit":"Project-management experience inside North America's largest diversified environmental services company, though the work itself is general rather than sustainability-specific.","lastSeen":"2026-11-26T15:44:36Z","location":"Vaughan, ON","pay":"Not stated on the posting","payHourlyMax":null,"payHourlyMin":null,"postedDate":"2026-11-19","source":"LinkedIn","startMonth":"","status":"open","summary":"Supports GFL's project and change managers with project charters, status reports, risk and issue logs, scheduling, stakeholder communications and basic budget tracking.","tags":["Project management","Waste management","Operations"],"term":"8 months (start date not stated)","title":"Project Coordinator Co-op","type":"Co-op","workMode":"On-site"},{"id":"p-government-of-canada-federal-student-work-experience-program-fswep","applyUrl":"https://www.canada.ca/en/public-service-commission/jobs/services/recruitment/students/federal-student-work-program.html","deadline":"","durationMonths":null,"eligibility":"Full-time students returning to studies; preference to Canadian citizens/PR","employer":"Government of Canada","firstSeen":"2026-11-20T03:33:44Z","fit":"One application puts an MScSM student in front of federal environment and climate hiring managers for summer 2027 terms.","lastSeen":"2026-11-27T19:40:22Z","location":"Canada-wide (GTA locations selectable)","pay":"Paid at federal student rates (linked TBS 'Student rates of pay', effective May 1, 2025): Master's $25.17 | $27.18 | $29.34 | $31.69 per hour","payHourlyMax":31.69,"payHourlyMin":25.17,"postedDate":"","source":"Government of Canada","startMonth":"","status":"open","summary":"Year-round inventory that federal departments, including ECCC and NRCan, use to hire students for paid work terms; placement field depends on the interests you select.","tags":["Government","Policy","Climate"],"term":"Flexible","title":"Federal Student Work Experience Program (FSWEP) – student inventory","type":"Internship","workMode":"On-site"},{"id":"p-green-infrastructure-partners-risk-analyst-intern","applyUrl":"https://gipi.wd3.myworkdayjobs.com/Careers/job/Markham-ON/Risk-Analyst-Intern_R10380","deadline":"2027-03-31","durationMonths":16,"eligibility":"Must be in a co-op or internship program in engineering, computer science, data science, math, statistics or related, and available for a continuous 16-month term","employer":"Green Infrastructure Partners (GIP)","firstSeen":"2026-11-26T15:47:41Z","fit":"Quantitative risk and AI-tooling experience at a large Canadian infrastructure builder, though the work is construction risk rather than sustainability.","lastSeen":"2026-11-26T15:47:41Z","location":"Markham / Toronto, ON","pay":"Not stated on the posting","payHourlyMax":null,"payHourlyMin":null,"postedDate":"2026-11-20","source":"Company site (via LinkedIn)","startMonth":"","status":"open","summary":"Supports GIP's risk group on major infrastructure bids and projects with risk registers, risk workshops, cost and schedule risk modelling, and AI and automation tools for risk reporting.","tags":["Risk","Infrastructure","Analytics"],"term":"16 months (start date not stated)","title":"Risk Analyst Intern","type":"Internship","workMode":""},{"id":"p-kiewit-jr-project-coordinator-co-op-winter-2027-8-12-months","applyUrl":"https://kiewitcareers.kiewit.com/job/Darlington-Jr_-Project-Coordinator-Co-op-Winter-2027-%288-12-months%29-ON/1427960800/","deadline":"","durationMonths":8,"eligibility":"Open – post-secondary degree or diploma students; Civil/Mechanical/Electrical Engineering preferred, not required; G licence and own vehicle required","employer":"Kiewit (Kiewit Nuclear Solutions)","firstSeen":"2026-11-27T19:40:22Z","fit":"A rare seat on Canada's first SMR construction site where engineering is preferred but not required, giving direct nuclear project experience.","lastSeen":"2026-11-27T19:40:22Z","location":"Clarington (Darlington), ON","pay":"Base Compensation: $21.00/hr - $26.00/hr","payHourlyMax":26,"payHourlyMin":21,"postedDate":"","source":"Company site","startMonth":"2027-01","status":"open","summary":"Supports the site-establishment team building the fabrication, warehouse and administration buildings on the DNNP (Darlington new nuclear) site, handling work packages, deviation approvals, progress reporting and scheduling.","tags":["Nuclear","Energy","SMR","Project coordination"],"term":"Winter 2027 (8–12 months)","title":"Jr. Project Coordinator Co-op - Winter 2027 (8-12 months)","type":"Co-op","workMode":"On-site"},{"id":"p-mackenzie-investments-summer-intern-2027-resources","applyUrl":"https://careersen-mackenzieinvestments.icims.com/jobs/5990/summer-intern-2027---investment-management%2c-resources/job","deadline":"2026-09-20","durationMonths":4,"eligibility":"Open – current master's students in science, business, economics or renewable energy who hold a science, engineering or economics bachelor's; French is an asset","employer":"Mackenzie Investments","firstSeen":"2026-11-26T15:51:43Z","fit":"Requires a current master's student and centres on sustainability measurement for resource investing, a direct match for MScSM training in sustainable finance and the energy transition.","lastSeen":"2026-11-26T15:51:43Z","location":"Greater Toronto Area, ON","pay":"The expected annual base salary range (prorated for the term) for this role is $68,250 and $78,000","payHourlyMax":37.5,"payHourlyMin":32.81,"postedDate":"","source":"Company site (via LinkedIn)","startMonth":"2027-05","status":"closed","summary":"Helps the Resources investment team set quantitative and qualitative sustainable-development measurement standards for its natural-resources investment universe, research investment themes and improve processes with AI.","tags":["ESG","Finance","Energy","Sustainable investing"],"term":"Summer 2027 (May–Aug)","title":"Summer Intern 2027 - Investment Management, Resources","type":"Internship","workMode":"Hybrid"},{"id":"p-manulife-summer-intern-2027-esg-sustainable-finance-intern","applyUrl":"https://ca.indeed.com/viewjob?jk=e54bbbde9e2c169f","deadline":"","durationMonths":null,"eligibility":"Open – current undergraduate or graduate students in finance, economics, business or related","employer":"Manulife","firstSeen":"2026-11-20T03:33:44Z","fit":"Climate-risk, financed-emissions and ESG-reporting work that maps directly onto MScSM training, with graduate students eligible.","lastSeen":"2026-11-26T05:34:29Z","location":"Toronto, ON","pay":"$39,000.00 CAD - $60,450.00 CAD (annual salary pro-rated based on the length of the work-term)","payHourlyMax":29.06,"payHourlyMin":18.75,"postedDate":"2026-09-29","source":"Indeed","startMonth":"","status":"closed","summary":"Supports Manulife's General Account ESG team in integrating ESG and climate factors into investment decisions, including climate risk analysis, portfolio emissions, ESG metrics and reporting.","tags":["ESG","Finance","Climate risk","Reporting"],"term":"Summer 2027","title":"Summer Intern 2027 - ESG & Sustainable Finance Intern","type":"Internship","workMode":"Hybrid"},{"id":"p-mott-macdonald-climate-change-and-sustainability-internship-2027","applyUrl":"https://apply.mottmac.com/job/Toronto-Climate-Change-and-Sustainability-Internship-2027-ON/1377316957/","deadline":"2026-11-30","durationMonths":3,"eligibility":"Open – Bachelor's or Master's students in engineering, environmental sciences, sustainability or related; 3 days/week in office","employer":"Mott MacDonald","firstSeen":"2026-11-20T03:33:44Z","fit":"Core carbon-accounting and climate-resilience consulting work that names sustainability master's students as eligible.","lastSeen":"2026-11-27T19:40:22Z","location":"Toronto, ON","pay":"The expected salary range for this position is from $18/hr - $35/hr.","payHourlyMax":35,"payHourlyMin":18,"postedDate":"","source":"Company site","startMonth":"2027-01","status":"open","summary":"Supports consulting teams on GHG inventories, climate risk and resilience assessments, net-zero strategies and green-building certifications such as LEED, Envision and CaGBC Zero Carbon.","tags":["Climate","Carbon accounting","Consulting"],"term":"Winter 2027 (Jan–Apr/May)","title":"Climate Change and Sustainability Internship - 2027","type":"Internship","workMode":"Hybrid"},{"id":"p-mott-macdonald-graduate-climate-sustainability-specialist-2027","applyUrl":"https://apply.mottmac.com/job/Toronto-Graduate-Climate-Change-and-Sustainability-Specialist-2027-ON/1377745057/","deadline":"2026-11-30","durationMonths":null,"eligibility":"Recent grads or final-year students with a bachelor's in engineering, environmental science, sustainability or related; a permanent full-time job, not a student work term","employer":"Mott MacDonald","firstSeen":"2026-11-26T15:49:42Z","fit":"Core MScSM consulting work on the same team as the board's Mott MacDonald internship, but as a permanent graduate job starting June 2027.","lastSeen":"2026-11-27T19:40:22Z","location":"Toronto, ON","pay":"The expected salary range for this position is from $63,000 - $77,000","payHourlyMax":37.02,"payHourlyMin":30.29,"postedDate":"","source":"Company site (via LinkedIn)","startMonth":"2027-06","status":"open","summary":"Supports Mott MacDonald's Climate Change & Sustainability team on GHG inventories, climate risk and resilience assessments, net-zero strategies and LEED, Envision and CaGBC Zero Carbon certifications for infrastructure projects.","tags":["Climate","Carbon accounting","Consulting"],"term":"Permanent, starts June 7, 2027 (3-year Blueprint graduate program)","title":"Graduate Climate Change and Sustainability Specialist - 2027","type":"New grad (permanent)","workMode":"Hybrid"},{"id":"p-prologis-energy-sales-intern","applyUrl":"https://prologis.wd5.myworkdayjobs.com/Prologis_External_Careers/job/San-Francisco-California/Energy-Sales-Intern_R6860","deadline":"2027-02-28","durationMonths":null,"eligibility":"Open – undergrads (rising 2nd–4th year) or current graduate students; graduate rate in Toronto is C$50–57/hr","employer":"Prologis","firstSeen":"2026-11-26T15:39:17Z","fit":"Hands-on solar and storage deal work with a separate, higher pay band for graduate students, a strong energy-transition placement for an MScSM student.","lastSeen":"2026-11-26T15:39:17Z","location":"Toronto, ON (also San Francisco, Denver, Los Angeles)","pay":"For Toronto (CAD): Undergraduate: $36–C$43 per hour. Graduate: $50–C$57 per hour.","payHourlyMax":57,"payHourlyMin":50,"postedDate":"2026-10-28","source":"Company site (via LinkedIn)","startMonth":"","status":"open","summary":"Supports Prologis Energy's sales team with rooftop solar and storage proposals, utility bill impact estimates, early-stage financial models, and regulatory and PPA research.","tags":["Energy","Renewables","Finance","Sales"],"term":"Summer 2027 (10–12 weeks)","title":"Energy Sales Intern","type":"Internship","workMode":""},{"id":"p-resource-innovations-energy-engineering-intern","applyUrl":"https://apply.workable.com/resource-innovations/j/4CAAA40639/apply","deadline":"","durationMonths":null,"eligibility":"Canadian citizens/PR only (or refugee status); post-secondary STEAM or business students","employer":"Resource Innovations","firstSeen":"2026-11-20T03:33:44Z","fit":"Energy-efficiency program evaluation is core sustainability-management work, and the role is open to non-engineering students.","lastSeen":"2026-11-27T19:40:22Z","location":"Toronto, ON","pay":"$27/hour","payHourlyMax":27,"payHourlyMin":27,"postedDate":"2026-10-09","source":"Company site","startMonth":"2027-01","status":"open","summary":"Evaluates, measures and verifies installed energy-efficiency measures and assesses utility demand-side management programs, including data analysis and technical reports.","tags":["Energy","Energy efficiency","Analytics"],"term":"Winter 2027 (Jan–May, possible extension)","title":"Energy Engineering Intern","type":"Co-op","workMode":"On-site"},{"id":"p-scarborough-transit-connect-environmental-intern-co-op","applyUrl":"https://www.jobs.ca/job/02b43747-ea3d-4568-ac32-f5e44a8e0835","deadline":"","durationMonths":null,"eligibility":"Open – students enrolled in a post-secondary co-op program in Environmental Sciences, Environmental Engineering or a related discipline","employer":"Scarborough Transit Connect (Aecon–FCC joint venture)","firstSeen":"2026-11-26T05:47:07Z","fit":"Hands-on environmental compliance and EMS experience on a major Toronto transit project; it was posted in March 2026 with rolling review, so confirm it is still open before applying.","lastSeen":"2026-11-26T05:52:00Z","location":"Scarborough (Toronto), ON","pay":"Compensation: $25 - $29 hourly.","payHourlyMax":29,"payHourlyMin":25,"postedDate":"2026-03-12","source":"Jobs.ca","startMonth":"","status":"closed","summary":"Supports the Scarborough Subway Extension environmental team with dust, noise, soil and water monitoring data, waste tracking, permit compliance and ISO 14001 audits.","tags":["Environmental compliance","ISO 14001","Infrastructure"],"term":"Not stated (rolling review)","title":"Environmental Intern Co-op","type":"Co-op","workMode":"On-site"},{"id":"p-ttm-technologies-ehss-intern-summer-2027","applyUrl":"https://www.linkedin.com/jobs/view/4488023473/","deadline":"","durationMonths":4,"eligibility":"Canadian citizens/PR only (Controlled Goods Program); must return to the final year of a relevant program in Sept 2027 and graduate by June 2028; US travel required","employer":"TTM Technologies","firstSeen":"2026-11-26T15:41:21Z","fit":"Hands-on environmental compliance and EHS management in a manufacturing setting, with a presentation to US executives and a possible permanent offer after graduation.","lastSeen":"2026-11-26T15:41:21Z","location":"Scarborough (Toronto), ON","pay":"Not stated on the posting (its Compensation section gives no amount for Canada)","payHourlyMax":null,"payHourlyMin":null,"postedDate":"2026-11-12","source":"LinkedIn","startMonth":"2027-05","status":"open","summary":"Supports site environmental, health, safety and security work at a circuit-board plant, including inspections, hazard assessments, EHS data reports, OHSA/WHMIS compliance and waste and spill-prevention projects, plus a four-month improvement project.","tags":["Environmental compliance","EHS","Manufacturing"],"term":"Summer 2027 (May–Aug)","title":"EHSS Intern - Summer 2027","type":"Internship","workMode":"On-site"}],"tracking":{}};</script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const safeUrl = u => { try { const x = new URL(String(u)); return /^https?:$/.test(x.protocol) ? x.href : ''; } catch (e) { return ''; } };
+const DAY = 864e5;
+const store = { get(k, d) { try { const v = localStorage.getItem('radar.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem('radar.' + k, JSON.stringify(v)); } catch (e) {} } };
+
+const VIEW_IDS = ['open', 'saved', 'applied', 'interview', 'rejected', 'letters', 'hidden', 'closed', 'boards'];
+const STATE_LABEL = { saved: 'Saved', applied: 'Applied', interview: 'Interview', rejected: 'Not selected', hidden: 'Hidden' };
+const OFF_OPEN = ['hidden', 'rejected'];
+const S = {
+  postings: new Map(), tracking: new Map(), run: null, request: null, config: null,
+  loaded: false, dbOk: true, sel: null,
+  f: Object.assign({ term: 'any', view: 'open', type: '', mode: '', sort: 'due', text: '' }, store.get('filters', {})),
+};
+if (!VIEW_IDS.includes(S.f.view)) S.f.view = 'open';
+let db = null, mcp = null;
+
+/* look: the neon gothic skin by default, the classic look on request (remembered in this browser) */
+function applySkin(s) {
+  const arcade = s !== 'classic';
+  document.documentElement.classList.toggle('arcade', arcade);
+  $('skinBtn').textContent = arcade ? 'Classic look' : 'Neon look';
+}
+applySkin(store.get('skin', 'arcade'));
+$('skinBtn').onclick = () => { const next = document.documentElement.classList.contains('arcade') ? 'classic' : 'arcade'; store.set('skin', next); applySkin(next); };
+
+/* music: loops from the first click or key press unless muted; the speaker button mutes it (remembered on this device) */
+const music = { el: null, on: false };
+function soundUI() {
+  const b = $('soundBtn'), on = music.on;
+  b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+  b.setAttribute('aria-label', on ? 'Mute music' : 'Play music'); b.title = on ? 'Mute music' : 'Play music';
+}
+function startMusic() {
+  if (!music.el) {
+    music.el = new Audio('music.mp3'); music.el.loop = true; music.el.volume = .5;
+    music.el.addEventListener('error', () => { music.on = false; soundUI(); $('soundBtn').hidden = true; });
+  }
+  music.on = true; soundUI();
+  const p = music.el.play(); if (p && p.catch) p.catch(() => { music.on = false; soundUI(); });
+}
+function stopMusic() { music.on = false; soundUI(); try { music.el?.pause(); } catch (e) {} }
+$('soundBtn').onclick = () => { if (music.on) { stopMusic(); store.set('muted', true); } else { store.set('muted', false); startMusic(); } };
+function firstTouch(e) {
+  if (e.target?.closest?.('#soundBtn')) return; // the button handles its own click
+  document.removeEventListener('pointerdown', firstTouch, true); document.removeEventListener('keydown', firstTouch, true);
+  if (!store.get('muted', false) && !music.on && !window.RADAR_SNAPSHOT) startMusic();
+}
+document.addEventListener('pointerdown', firstTouch, true); document.addEventListener('keydown', firstTouch, true);
+document.addEventListener('visibilitychange', () => { if (!music.el || !music.on) return; if (document.hidden) music.el.pause(); else music.el.play().catch(() => {}); });
+
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, 3200); }
+const fmtDate = (iso, opts) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString(undefined, opts || { month: 'short', day: 'numeric' }); };
+const fmtTime = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); };
+const ago = iso => { const m = Math.round((Date.now() - new Date(iso)) / 6e4); if (!isFinite(m)) return ''; if (m < 1) return 'just now'; if (m < 60) return m + ' min ago'; const h = Math.round(m / 60); if (h < 24) return h + ' h ago'; return Math.round(h / 24) + ' d ago'; };
+function todayStart() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+function daysLeft(p) { if (!p.deadline) return null; const d = new Date(p.deadline + 'T23:59:59'); if (isNaN(d)) return null; return Math.ceil((d - todayStart()) / DAY) - 1; }
+function termOf(p) {
+  const m = String(p.startMonth || '');
+  if (/^2027-0[4-7]/.test(m) || /summer\s*2027/i.test(p.term || '')) return 'summer';
+  if (/^\d{4}-\d{2}$/.test(m)) return m < '2027-04' ? 'earlier' : 'later';
+  return 'flex';
+}
+function isOpen(p) { if (p.status === 'closed') return false; const d = daysLeft(p); return d == null || d >= 0; }
+function payText(p) {
+  const lo = +p.payHourlyMin, hi = +p.payHourlyMax;
+  if (lo > 0 && hi > lo) return `$${lo.toFixed(lo % 1 ? 2 : 0)}–${hi.toFixed(hi % 1 ? 2 : 0)}<small>/hr</small>`;
+  if (lo > 0) return `$${lo.toFixed(lo % 1 ? 2 : 0)}<small>/hr</small>`;
+  if (hi > 0) return `$${hi.toFixed(hi % 1 ? 2 : 0)}<small>/hr</small>`;
+  return `Paid<small> · amount not listed</small>`;
+}
+const payVal = p => +p.payHourlyMax || +p.payHourlyMin || 0;
+const trackState = id => S.tracking.get(id)?.state || '';
+function hue(s) { let h = 0; for (const ch of String(s || '')) h = (h * 31 + ch.codePointAt(0)) % 360; return h; }
+function initial(s) { const m = String(s || '').match(/[A-Za-z0-9]/); return m ? m[0].toUpperCase() : '?'; }
+const logoHTML = p => `<span class="logo" style="--h:${hue(p.employer)}" aria-hidden="true">${esc(initial(p.employer))}</span>`;
+function monthLabel(m) { if (!/^\d{4}-\d{2}$/.test(String(m || ''))) return ''; const [y, mm] = String(m).split('-'); return new Date(+y, +mm - 1, 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }); }
+function dueHTML(p) {
+  const d = daysLeft(p);
+  return p.status === 'closed' ? `<span class="due none">Closed</span>`
+    : d == null ? `<span class="due none">No deadline listed</span>`
+    : d < 0 ? `<span class="due none">Deadline passed</span>`
+    : d === 0 ? `<span class="due soon">Closes today</span>`
+    : d <= 14 ? `<span class="due soon">Closes in ${d} day${d === 1 ? '' : 's'}</span>`
+    : `<span class="due">Apply by ${esc(fmtDate(p.deadline + 'T12:00:00'))}</span>`;
+}
+
+const VIEWS = {
+  open: ['Open roles', 'Paid sustainability internships and co-ops in the GTA and remote in Canada, aimed at the May–August 2027 work term.', 'Nothing matches these filters', 'Try Any start, or clear the search box.'],
+  saved: ['Saved', 'Roles you saved to come back to.', 'Nothing saved yet', 'Press Save on a role to keep it here.'],
+  applied: ['Applied', 'Roles you have applied to and are waiting to hear back on.', 'No applications marked', 'Press Applied on a role once you apply.'],
+  interview: ['Interviews', 'Roles where an employer has asked you to interview.', 'No interviews marked', 'Press Interview on a role when an employer invites you.'],
+  rejected: ['Not selected', 'Their loss. These leave Open roles and stay here for your records.', 'Nothing here', 'Press Not selected on a role when an employer turns you down.'],
+  letters: ['Cover letters', 'Roles with a cover letter draft.', 'No cover letters yet', 'Open a role and press Write cover letter.'],
+  hidden: ['Hidden', 'Roles you hid. Unhide one to put it back in Open roles.', 'Nothing hidden', 'Roles you hide land here.'],
+  closed: ['Closed', 'Roles whose deadline passed or that were taken down.', 'Nothing closed', 'Roles move here when their deadline passes.'],
+  boards: ['Job boards', 'Places to search yourself, beyond what Refresh finds.', '', ''],
+};
+
+/* ---------- rendering ---------- */
+function filtered() {
+  const f = S.f, q = f.text.trim().toLowerCase(), isOpenView = f.view === 'open';
+  let arr = [...S.postings.values()];
+  arr = arr.filter(p => {
+    const t = trackState(p.id);
+    if (isOpenView) { if (OFF_OPEN.includes(t) || !isOpen(p)) return false; }
+    else if (f.view === 'letters') { if (!hasLetter(p.id)) return false; }
+    else if (f.view === 'closed') { if (isOpen(p)) return false; }
+    else if (f.view !== t) return false;
+    if (isOpenView && f.term === 'summer' && termOf(p) !== 'summer') return false;
+    if (isOpenView && f.term === 'earlier' && termOf(p) !== 'earlier') return false;
+    if (isOpenView && f.type && p.type !== f.type) return false;
+    if (isOpenView && f.mode && p.workMode !== f.mode) return false;
+    if (q) { const hay = [p.title, p.employer, p.location, p.summary, p.fit, ...(Array.isArray(p.tags) ? p.tags : [])].join(' ').toLowerCase(); if (!hay.includes(q)) return false; }
+    return true;
+  });
+  const due = p => { const d = daysLeft(p); return d == null ? 1e9 : d; };
+  if (f.sort === 'due') arr.sort((a, b) => due(a) - due(b) || payVal(b) - payVal(a));
+  if (f.sort === 'pay') arr.sort((a, b) => payVal(b) - payVal(a) || due(a) - due(b));
+  if (f.sort === 'new') arr.sort((a, b) => String(b.firstSeen || '').localeCompare(String(a.firstSeen || '')));
+  return arr;
+}
+
+function rowHTML(p) {
+  const t = trackState(p.id), fresh = p.firstSeen && (Date.now() - new Date(p.firstSeen)) < 3 * DAY;
+  const marks = [
+    fresh && isOpen(p) ? '<span class="chip new">New</span>' : '',
+    termOf(p) === 'summer' ? '<span class="chip">Summer 2027</span>' : '',
+    t === 'saved' ? '<span class="chip mark">Saved</span>' : '',
+    t === 'applied' ? '<span class="chip ok">Applied</span>' : '',
+    t === 'interview' ? '<span class="chip int">Interview</span>' : '',
+    t === 'rejected' ? '<span class="chip no">Not selected</span>' : '',
+    hasLetter(p.id) ? '<span class="chip mark">Letter</span>' : '',
+  ].join('');
+  return `<button type="button" class="row${isOpen(p) && t !== 'rejected' ? '' : ' dim'}" data-id="${esc(p.id)}" aria-current="${p.id === S.sel}">
+    ${logoHTML(p)}
+    <span class="row-main"><span class="row-title">${esc(p.title)}</span><span class="row-sub">${esc(p.employer)} · ${esc(p.location || 'Location not listed')}</span>${marks ? `<span class="row-marks">${marks}</span>` : ''}</span>
+    <span class="row-side"><span class="pay">${payText(p)}</span>${dueHTML(p)}</span>
+  </button>`;
+}
+
+function detailHTML(p) {
+  const url = safeUrl(p.applyUrl), t = trackState(p.id);
+  const long = { month: 'long', day: 'numeric', year: 'numeric' };
+  const elig = String(p.eligibility || '');
+  const tAt = S.tracking.get(p.id)?.at;
+  const facts = [
+    ['My status', t ? (STATE_LABEL[t] || t) + (tAt && fmtDate(tAt, long) ? ' · ' + fmtDate(tAt, long) : '') : ''],
+    ['Deadline', p.status === 'closed' ? 'Closed' : p.deadline ? fmtDate(p.deadline + 'T12:00:00', long) : 'None listed'],
+    ['Starts', monthLabel(p.startMonth) || p.term || 'Not listed'],
+    ['Length', p.durationMonths ? p.durationMonths + ' months' : ''],
+    ['Location', [p.location, p.workMode].filter(Boolean).join(' · ')],
+    ['Who can apply', elig, elig && !/^open/i.test(elig) ? 'warn' : ''],
+    ['Posted', p.postedDate ? fmtDate(p.postedDate + 'T12:00:00', long) : ''],
+    ['Found via', p.source],
+    ['On the board since', p.firstSeen ? fmtDate(p.firstSeen, long) : ''],
+  ].filter(f => f[1]);
+  const tags = (Array.isArray(p.tags) ? p.tags : []).slice(0, 4).map(x => `<span class="chip">${esc(x)}</span>`).join('');
+  return `<div class="d-wrap">
+    <button type="button" class="btn sm back" data-close-detail>← Back to roles</button>
+    <div>
+      <div class="eyebrow"><span>${esc(p.type || 'Internship')}</span>${p.term ? `<span>${esc(p.term)}</span>` : ''}</div>
+      <h2>${esc(p.title)}</h2>
+      <div class="d-org">${logoHTML(p)}<span><b>${esc(p.employer)}</b>${p.location ? ' · ' + esc(p.location) : ''}</span></div>
+    </div>
+    <div class="d-pay"><span class="pay">${payText(p)}</span>${p.pay ? `<span class="pay-raw">As posted: ${esc(p.pay)}</span>` : ''}</div>
+    <div class="d-actions">
+      ${url ? `<a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener">Apply on the posting</a>` : ''}
+      ${S.letterOn ? `<button type="button" class="btn" data-letter>${hasLetter(p.id) ? 'Edit cover letter' : 'Write cover letter'}</button>` : ''}
+      ${dueHTML(p)}
+    </div>
+    <div class="track" role="group" aria-label="Track this role">
+      <button type="button" data-act="saved" aria-pressed="${t === 'saved'}">Save</button>
+      <button type="button" data-act="applied" aria-pressed="${t === 'applied'}">Applied</button>
+      <button type="button" data-act="interview" aria-pressed="${t === 'interview'}">Interview</button>
+      <button type="button" data-act="rejected" aria-pressed="${t === 'rejected'}">Not selected</button>
+      <button type="button" data-act="hidden" aria-pressed="${t === 'hidden'}">${t === 'hidden' ? 'Unhide' : 'Hide'}</button>
+    </div>
+    ${p.summary ? `<section class="d-sec"><h3>The work</h3><p>${esc(p.summary)}</p></section>` : ''}
+    ${p.fit ? `<section class="d-sec"><h3>Why it fits</h3><p>${esc(p.fit)}</p></section>` : ''}
+    <dl class="facts">${facts.map(f => `<dt>${esc(f[0])}</dt><dd${f[2] ? ` class="${f[2]}"` : ''}>${esc(f[1])}</dd>`).join('')}</dl>
+    ${tags ? `<div class="chips">${tags}</div>` : ''}
+    <p class="note">Details come from the posting on the day it was found. Check the posting before you apply.</p>
+  </div>`;
+}
+
+function markSel() { document.querySelectorAll('#list .row').forEach(r => r.setAttribute('aria-current', String(r.dataset.id === S.sel))); }
+function renderDetail() {
+  const box = $('detail'), p = S.sel ? S.postings.get(S.sel) : null;
+  const ae = document.activeElement, act = ae && box.contains(ae) ? (ae.dataset.act || (ae.hasAttribute('data-letter') ? 'letter' : '')) : '';
+  if (!p) { box.removeAttribute('data-id'); box.innerHTML = `<div class="empty"><h3>Pick a role</h3><p>Its pay, deadline, details and apply link show here.</p></div>`; return; }
+  box.dataset.id = p.id; box.innerHTML = detailHTML(p);
+  if (act) { try { box.querySelector(act === 'letter' ? '[data-letter]' : `[data-act="${act}"]`)?.focus({ preventScroll: true }); } catch (e) {} }
+}
+
+function render() {
+  document.querySelectorAll('[data-term]').forEach(b => b.setAttribute('aria-pressed', b.dataset.term === S.f.term));
+  document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-current', b.dataset.view === S.f.view ? 'page' : 'false'));
+  $('fType').value = S.f.type; $('fMode').value = S.f.mode; $('fSort').value = S.f.sort; if (document.activeElement !== $('fText')) $('fText').value = S.f.text;
+  const v = VIEWS[S.f.view] || VIEWS.open, boards = S.f.view === 'boards';
+  $('viewTitle').textContent = v[0]; $('viewSub').textContent = v[1];
+  $('boards').hidden = !boards; $('work').hidden = boards; $('filters').hidden = boards; $('overview').hidden = S.f.view !== 'open';
+  $('filters').classList.toggle('only-sort', S.f.view !== 'open');
+
+  const all = [...S.postings.values()], open = all.filter(p => isOpen(p) && !OFF_OPEN.includes(trackState(p.id)));
+  const counts = { open: open.length, saved: 0, applied: 0, interview: 0, rejected: 0, hidden: 0, letters: 0, closed: 0 };
+  for (const p of all) { const t = trackState(p.id); if (t && t in counts) counts[t]++; if (hasLetter(p.id)) counts.letters++; if (!isOpen(p)) counts.closed++; }
+  document.querySelectorAll('.nav [data-view]').forEach(b => { const n = b.querySelector('.n'); if (n) n.textContent = S.loaded && counts[b.dataset.view] ? counts[b.dataset.view] : ''; });
+  const summer = open.filter(p => termOf(p) === 'summer').length;
+  const soon = open.filter(p => { const d = daysLeft(p); return d != null && d <= 14; }).length;
+  const st = $('stats').querySelectorAll('.metric b');
+  if (S.loaded) { st[0].textContent = open.length; st[1].textContent = summer; st[2].textContent = soon; st[3].textContent = counts.applied + counts.interview + counts.rejected; }
+
+  // start-month strip: this month through Sept 2027
+  const months = []; const now = new Date(); let y = now.getFullYear(), m = now.getMonth();
+  while (y < 2027 || (y === 2027 && m <= 8)) { months.push(`${y}-${String(m + 1).padStart(2, '0')}`); m++; if (m > 11) { m = 0; y++; } if (months.length > 14) break; }
+  const byMonth = new Map(); let flex = 0;
+  for (const p of open) { const sm = String(p.startMonth || ''); if (/^\d{4}-\d{2}$/.test(sm)) byMonth.set(sm, (byMonth.get(sm) || 0) + 1); else flex++; }
+  $('cal').innerHTML = months.map(k => { const c = byMonth.get(k) || 0, [yy, mm] = k.split('-'); const nm = new Date(+yy, +mm - 1, 1).toLocaleDateString(undefined, { month: 'short' });
+    const win = yy === '2027' && +mm >= 5 && +mm <= 8; return `<div class="m${win ? ' win' : ''}${c ? '' : ' zero'}" title="${c} role${c === 1 ? '' : 's'} starting ${nm} ${yy}"><span class="c">${S.loaded ? c : '·'}</span><span class="n">${nm}${mm === '01' ? ' ' + yy.slice(2) : ''}</span></div>`; }).join('')
+    + `<div class="m${flex ? '' : ' zero'}" title="Start not listed or flexible"><span class="c">${S.loaded ? flex : '·'}</span><span class="n">Flex</span></div>`;
+
+  const list = $('list');
+  if (!S.dbOk) { list.innerHTML = `<div class="empty"><h3>Open this board in Claude</h3><p>Your roles live in the board's database, which only loads inside Claude.</p></div>`; $('count').textContent = ''; $('detail').innerHTML = ''; return; }
+  if (!S.loaded || boards) return;
+  const rows = filtered();
+  $('count').textContent = `${rows.length} shown`;
+  if (!all.length) list.innerHTML = `<div class="empty"><h3>No roles yet</h3><p>Press Refresh and Claude will search for paid sustainability internships and co-ops. New roles land here as they're found.</p></div>`;
+  else if (!rows.length) list.innerHTML = `<div class="empty"><h3>${esc(v[2])}</h3><p>${esc(v[3])}</p></div>`;
+  else list.innerHTML = rows.map(rowHTML).join('');
+  if (!rows.some(p => p.id === S.sel)) S.sel = rows[0]?.id || null;
+  markSel(); renderDetail();
+}
+
+const narrow = () => window.matchMedia('(max-width: 1179px)').matches;
+function openDrawer() {
+  document.body.classList.add('detail-open');
+  setTimeout(() => { try { $('detail').querySelector('.back')?.focus({ preventScroll: true }); } catch (e) {} }, 40);
+}
+function closeDrawer() {
+  if (!document.body.classList.contains('detail-open')) return;
+  document.body.classList.remove('detail-open');
+  try { document.querySelector(`#list .row[data-id="${CSS.escape(S.sel || '')}"]`)?.focus({ preventScroll: true }); } catch (e) {}
+}
+function selectRole(id, openIt) {
+  S.sel = id; markSel(); renderDetail(); $('detail').scrollTop = 0;
+  if (openIt && narrow()) openDrawer();
+}
+
+/* ---------- refresh status ---------- */
+const RUN_STALE_MIN = 75;
+function runState() {
+  const run = S.run || {}, req = S.request || {};
+  const started = run.startedAt ? new Date(run.startedAt) : null, requested = req.requestedAt ? new Date(req.requestedAt) : null;
+  if (requested && (!started || requested > started) && Date.now() - requested < 20 * 6e4) return { kind: 'queued', at: req.requestedAt };
+  if (run.state === 'running' && started && Date.now() - started < RUN_STALE_MIN * 6e4) return { kind: 'running', at: run.startedAt };
+  if (run.state === 'running') return { kind: 'stalled', at: run.startedAt };
+  if (run.state === 'done') return { kind: 'done', at: run.finishedAt || run.startedAt, run };
+  if (run.state === 'error') return { kind: 'error', at: run.finishedAt || run.startedAt, run };
+  return { kind: 'never' };
+}
+function renderRefresh() {
+  if (SNAP) return;
+  const rs = runState(), btn = $('refreshBtn'), busy = rs.kind === 'queued' || rs.kind === 'running';
+  $('refreshIcon').hidden = !busy;
+  $('refreshLabel').textContent = busy ? 'Refreshing…' : 'Refresh';
+  btn.disabled = busy || !mcp || !S.config?.triggerId;
+  const st = $('runStatus');
+  if (!S.dbOk) { st.textContent = 'Open in Claude to load and refresh your board.'; return; }
+  if (rs.kind === 'queued') st.innerHTML = `<span class="pulse"></span>Refresh requested ${esc(ago(rs.at))}. Claude is starting a search.`;
+  else if (rs.kind === 'running') st.innerHTML = `<span class="pulse"></span>Searching since ${esc(fmtTime(rs.at))}. New roles appear as they're found, usually within 15–30 minutes.`;
+  else if (rs.kind === 'stalled') st.innerHTML = `The last refresh (${esc(fmtTime(rs.at))}) didn't finish. Press Refresh to try again.`;
+  else if (rs.kind === 'done') { const r = rs.run; st.innerHTML = `Last refreshed <b>${esc(fmtTime(rs.at))}</b>${r.added != null ? ` · ${esc(r.added)} new, ${esc(r.closed || 0)} closed` : ''}${r.note ? `<br>${esc(r.note)}` : ''}`; }
+  else if (rs.kind === 'error') st.innerHTML = `The last refresh hit a problem${rs.run.note ? ': ' + esc(rs.run.note) : ''}. Press Refresh to try again.`;
+  else st.textContent = S.loaded ? 'Not refreshed yet. Press Refresh to search.' : 'Connecting to your board…';
+  if (!busy && !mcp && S.loaded) st.innerHTML += `<br>Refreshing works when the board is open in Claude.`;
+}
+
+async function refresh() {
+  if (!mcp || !S.config?.triggerId) return;
+  const rs = runState(); if (rs.kind === 'queued' || rs.kind === 'running') { toast('A refresh is already running.'); return; }
+  const btn = $('refreshBtn'); btn.disabled = true; $('refreshIcon').hidden = false; $('refreshLabel').textContent = 'Starting…';
+  try {
+    await mcp.callTool('Claude Code Remote', 'fire_trigger', { trigger_id: S.config.triggerId }, { cache: false });
+    try { await db.doc('meta/request').set({ requestedAt: new Date().toISOString() }); } catch (e) {}
+    toast('Refresh started. New roles will appear here.');
+  } catch (e) {
+    const c = e?.code;
+    if (c === 'approval_required') toast('Claude needs your approval to start the refresh. Press Refresh again and choose Allow.');
+    else if (c === 'not_in_manifest') toast('Refreshing is turned off for this board. Allow the Claude Code Remote connector in the board\'s permissions.');
+    else if (c === 'server_not_connected' || c === 'needs_reauth') toast('Connect Claude Code Remote in claude.ai Settings → Connectors, then try again.');
+    else if (c === 'blocked_by_policy') toast('Your organization blocks starting tasks from a page.');
+    else if (c === 'tool_error') toast('The refresh task could not start: ' + String(e.message || '').slice(0, 140));
+    else if (c === 'server_unavailable' || c === 'upstream_error') toast('Couldn\'t reach Claude just now. The refresh may still have started, so wait a minute before trying again.');
+    else toast('Refresh is not available in this view.');
+  } finally { renderRefresh(); }
+}
+
+/* ---------- tracking writes (one at a time per role) ---------- */
+const pending = new Map();
+function setTrack(id, act) {
+  if (!id) return;
+  const cur = trackState(id), next = cur === act ? '' : act;
+  if (SNAP) {
+    if (next) S.tracking.set(id, { id, state: next }); else S.tracking.delete(id);
+    store.set('snapTracking', Object.fromEntries([...S.tracking].map(([k, v]) => [k, v.state])));
+    render(); return;
+  }
+  if (!db) return;
+  if (next) S.tracking.set(id, { id, state: next }); else S.tracking.delete(id);
+  render(); updateBadge();
+  const prev = pending.get(id) || Promise.resolve();
+  const p = prev.then(() => next ? db.collection('tracking').doc(id).set({ state: next, at: new Date().toISOString() }) : db.collection('tracking').doc(id).delete())
+    .catch(e => { toast(e?.code === 'quota_exceeded' ? 'The board is full. Hide fewer roles or clear old ones.' : 'Couldn\'t save that change. Check your connection.'); });
+  pending.set(id, p);
+}
+
+/* ---------- wiring ---------- */
+function saveFilters() { store.set('filters', S.f); render(); }
+document.querySelectorAll('[data-term]').forEach(b => b.onclick = () => { S.f.term = b.dataset.term; saveFilters(); });
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { S.f.view = b.dataset.view; closeDrawer(); S.sel = null; saveFilters(); try { window.scrollTo({ top: 0 }); } catch (e) {} });
+$('fType').onchange = e => { S.f.type = e.target.value; saveFilters(); };
+$('fMode').onchange = e => { S.f.mode = e.target.value; saveFilters(); };
+$('fSort').onchange = e => { S.f.sort = e.target.value; saveFilters(); };
+let tTimer; $('fText').oninput = e => { clearTimeout(tTimer); tTimer = setTimeout(() => { S.f.text = e.target.value; saveFilters(); }, 150); };
+$('list').addEventListener('click', e => { const r = e.target.closest('.row'); if (r) selectRole(r.dataset.id, true); });
+$('detail').addEventListener('click', e => {
+  const id = $('detail').dataset.id;
+  const t = e.target.closest('[data-act]'); if (t) { setTrack(id, t.dataset.act); return; }
+  if (e.target.closest('[data-letter]')) { openLetter(id); return; }
+  if (e.target.closest('[data-close-detail]')) closeDrawer();
+});
+$('detailScrim').onclick = closeDrawer;
+$('refreshBtn').onclick = refresh;
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey || anyOpen()) return;
+  if (e.key === 'Escape') { closeDrawer(); return; }
+  const tag = String(e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if (e.key === '/') { e.preventDefault(); $('fText').focus(); return; }
+  if (!['ArrowDown', 'ArrowUp', 'j', 'k'].includes(e.key) || S.f.view === 'boards') return;
+  const ids = [...document.querySelectorAll('#list .row')].map(r => r.dataset.id); if (!ids.length) return;
+  e.preventDefault();
+  let i = ids.indexOf(S.sel); i = (e.key === 'ArrowDown' || e.key === 'j') ? Math.min(ids.length - 1, i + 1) : Math.max(0, i - 1);
+  selectRole(ids[i], false);
+  try { document.querySelector(`#list .row[data-id="${CSS.escape(S.sel)}"]`)?.scrollIntoView({ block: 'nearest' }); } catch (err) {}
+});
+
+/* ---------- export: CSV and a standalone offline copy ---------- */
+const SNAP = window.RADAR_SNAPSHOT || null;
+let dl = null;
+/* every role with every detail, plus the student's own status; columns: [header, value, Excel width] */
+const ymd = iso => { const d = new Date(iso); return iso && !isNaN(d) ? d.toLocaleDateString('en-CA') : ''; };
+const numOr = v => (v === '' || v == null || !isFinite(+v)) ? '' : +v;
+const EXPORT_COLS = [
+  ['Role', p => p.title, 42],
+  ['Employer', p => p.employer, 26],
+  ['My status', p => STATE_LABEL[trackState(p.id)] || '', 13],
+  ['Status updated', p => ymd(S.tracking.get(p.id)?.at), 13],
+  ['Posting', p => isOpen(p) ? 'Open' : 'Closed', 9],
+  ['Deadline', p => p.deadline || '', 11],
+  ['Pay (as posted)', p => p.pay, 46],
+  ['Pay from ($/hr)', p => numOr(p.payHourlyMin), 10],
+  ['Pay to ($/hr)', p => numOr(p.payHourlyMax), 10],
+  ['Type', p => p.type, 10],
+  ['Term', p => p.term, 26],
+  ['Start month', p => p.startMonth, 10],
+  ['Length (months)', p => numOr(p.durationMonths), 9],
+  ['Location', p => p.location, 24],
+  ['Work mode', p => p.workMode, 10],
+  ['Who can apply', p => p.eligibility, 36],
+  ['The work', p => p.summary, 60],
+  ['Why it fits', p => p.fit, 50],
+  ['Tags', p => Array.isArray(p.tags) ? p.tags.join('; ') : p.tags, 22],
+  ['Posted', p => p.postedDate || '', 11],
+  ['On the board since', p => ymd(p.firstSeen), 12],
+  ['Last checked', p => ymd(p.lastSeen), 12],
+  ['Found via', p => p.source, 18],
+  ['Apply link', p => safeUrl(p.applyUrl), 50],
+  ['Cover letter draft', p => hasLetter(p.id) ? 'Yes' : '', 9],
+];
+function exportRows() {
+  return [...S.postings.values()].sort((a, b) => (isOpen(b) - isOpen(a))
+    || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999'))
+    || String(a.employer || '').localeCompare(String(b.employer || '')));
+}
+function csvText() {
+  const q = v => { const s = String(v ?? ''); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const lines = [EXPORT_COLS.map(c => q(c[0])).join(','), ...exportRows().map(p => EXPORT_COLS.map(c => q(c[1](p))).join(','))];
+  return '﻿' + lines.join('\r\n') + '\r\n';
+}
+async function xlsxBlob() {
+  const X = await loadLib('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', () => window.XLSX);
+  const rows = exportRows(), linkCol = EXPORT_COLS.findIndex(c => c[0] === 'Apply link');
+  const sheet = list => {
+    const ws = X.utils.aoa_to_sheet([EXPORT_COLS.map(c => c[0]), ...list.map(p => EXPORT_COLS.map(c => { const v = c[1](p); return v === '' || v == null ? null : v; }))]);
+    ws['!cols'] = EXPORT_COLS.map(c => ({ wch: c[2] }));
+    list.forEach((p, i) => { const u = safeUrl(p.applyUrl), cell = ws[X.utils.encode_cell({ r: i + 1, c: linkCol })]; if (u && cell) cell.l = { Target: u }; });
+    if (list.length) ws['!autofilter'] = { ref: X.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: list.length, c: EXPORT_COLS.length - 1 } }) };
+    return ws;
+  };
+  const wb = X.utils.book_new();
+  X.utils.book_append_sheet(wb, sheet(rows), 'All roles');
+  const mine = rows.filter(p => { const t = trackState(p.id); return t && t !== 'hidden'; });
+  if (mine.length) X.utils.book_append_sheet(wb, sheet(mine), 'My applications');
+  return new Blob([X.write(wb, { bookType: 'xlsx', type: 'array' })]);
+}
+function snapshotHTML() {
+  const style = [...document.querySelectorAll('style')].map(s => s.textContent).find(t => t.includes('--font-display')) || '';
+  const script = [...document.querySelectorAll('script:not([src])')].map(s => s.textContent).find(t => t.includes('RADAR_SNAPSHOT')) || '';
+  const data = { takenAt: new Date().toISOString(), run: S.run, postings: [...S.postings.values()], tracking: Object.fromEntries([...S.tracking].map(([k, v]) => [k, v.state])) };
+  const json = JSON.stringify(data).replace(/</g, '\\u003c');
+  const wrap = document.querySelector('.wrap').cloneNode(true);
+  wrap.querySelector('#list').innerHTML = '';
+  wrap.querySelector('#detail').innerHTML = '';
+  return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>MScSM Co-op Radar (offline copy)</title>\n'
+    + '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Spectral:wght@400;500;600&family=UnifrakturMaguntia&family=VT323&display=swap">\n'
+    + '<style>[hidden]{display:none!important} body{margin:0} :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}\n' + style + '</style>\n</head>\n<body>\n'
+    + wrap.outerHTML + '\n<div class="toast" id="toast" hidden></div>\n'
+    + '<script>window.RADAR_SNAPSHOT = ' + json + ';<\/script>\n<script>' + script + '<\/script>\n</body>\n</html>\n';
+}
+async function saveFile(name, data) {
+  if (SNAP) { // outside Claude a plain download link works
+    const a = document.createElement('a'), url = URL.createObjectURL(new Blob([data], { type: 'text/plain' }));
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); return;
+  }
+  if (!dl) return;
+  try { await dl.save({ filename: name, data }); toast('Saved ' + name); }
+  catch (e) {
+    if (e?.code === 'declined') return;
+    if (e?.code === 'rate_limited') toast('Another save is open. Try again in a moment.');
+    else if (e?.code === 'extension_not_enabled' || e?.code === 'rejected_extension') toast('This view can\'t save that file type. Try the board on claude.ai.');
+    else { toast('Saving isn\'t available in this view.'); $('saveHtml').hidden = $('saveCsv').hidden = $('exportBtn').hidden = true; }
+  }
+}
+const stamp = () => new Date().toISOString().slice(0, 10);
+$('saveHtml').onclick = () => saveFile(`MScSM Co-op Radar ${stamp()}.html`, snapshotHTML());
+$('saveCsv').onclick = () => saveFile(`MScSM Co-op Radar ${stamp()}.csv`, csvText());
+$('exportBtn').onclick = async () => {
+  const b = $('exportBtn'); b.disabled = true;
+  try { await saveFile(`MScSM Co-op Radar ${stamp()}.xlsx`, await xlsxBlob()); }
+  catch (e) { toast('Couldn\'t build the Excel file. Use Export .csv in the sidebar instead.'); }
+  finally { b.disabled = false; }
+};
+
+/* ---------- cover letters ----------
+   The student's details and drafts live in their own private part of the board's database
+   (data/users/<id>/profile and data/users/<id>/profile/letters/<role id>), which nobody else can read. */
+let sample = null, uid = null, profileRef = null;
+S.profile = null; S.letters = new Map(); S.letterOn = false; S.localLetters = false;
+const PF_FIELDS = ['fullName', 'email', 'phone', 'city', 'linkedin', 'program', 'gradDate', 'availability', 'background', 'skills', 'experience', 'goals', 'resume', 'signoff'];
+const PF_DEFAULTS = { city: 'Mississauga, ON', program: 'Master of Science in Sustainability Management (MScSM), University of Toronto Mississauga', availability: 'Available for a four-month work term, May to August 2027', signoff: 'Sincerely' };
+const L = { id: null, ctl: null, busy: false, timer: null, dirty: false };
+const lpending = new Map();
+function hasLetter(id) { return !!String(S.letters?.get(id)?.text || '').trim(); }
+function hasInfo() { return !!String(S.profile?.fullName || '').trim(); }
+
+async function initLetters() {
+  if (SNAP || !window.claude?.use) return;
+  const [smp, usr] = await Promise.all([window.claude.use('sample').catch(() => null), window.claude.use('user').catch(() => null)]);
+  if (!smp) return;
+  sample = smp;
+  try { uid = usr ? await usr.id() : null; } catch (e) { uid = null; }
+  try { profileRef = db && uid ? db.doc('data/users/' + uid + '/profile') : null; } catch (e) { profileRef = null; }
+  if (profileRef) {
+    profileRef.onSnapshot(s => { S.profile = s.exists ? s.data() : null; updateNeedInfo(); }, () => {});
+    profileRef.collection('letters').onSnapshot(snap => { S.letters = new Map(snap.docs.map(d => [d.id, d.data()])); render(); }, () => {});
+  } else {
+    S.localLetters = true;
+    S.profile = store.get('profile', null);
+    S.letters = new Map(Object.entries(store.get('letters', {}) || {}));
+    $('pfWhere').textContent = 'Your account isn\'t available in this view, so your details are saved in this browser only.';
+  }
+  S.letterOn = true; $('profileBtn').hidden = false; render();
+}
+
+let lastFocus = null;
+const anyOpen = () => !!document.querySelector('.scrim:not([hidden])');
+function showDlg(id, focusSel) {
+  const d = $(id); if (!anyOpen()) lastFocus = document.activeElement;
+  d.hidden = false; d.scrollTop = 0; document.body.classList.add('locked');
+  const f = (focusSel && d.querySelector(focusSel)) || d.querySelector('.x');
+  setTimeout(() => { try { f?.focus({ preventScroll: true }); } catch (e) {} }, 0);
+}
+function hideDlg(id) {
+  $(id).hidden = true;
+  if (!anyOpen()) { document.body.classList.remove('locked'); try { lastFocus?.focus({ preventScroll: true }); } catch (e) {} }
+}
+
+function openProfile() {
+  const p = Object.assign({}, PF_DEFAULTS, S.profile || {});
+  for (const k of PF_FIELDS) { const el = $('pf_' + k); if (el) el.value = String(p[k] ?? ''); }
+  $('pfStatus').textContent = '';
+  pfResumeFile = null; resumeHint();
+  $('pfUpNote').textContent = 'Upload or drop a PDF or Word file. Its text goes into the résumé field and Claude fills in any empty fields. Check everything before you save.';
+  showDlg('profileDlg', '#pf_fullName');
+}
+
+/* résumé upload: pull the text out of a PDF, Word or text file in the browser (the file itself is never stored),
+   then ask Claude to fill only the fields that are still empty, using nothing but what the résumé says */
+let pfResumeFile = null;
+const PF_AUTO = ['fullName', 'email', 'phone', 'city', 'linkedin', 'program', 'gradDate', 'background', 'skills', 'experience'];
+const PDF_JS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+const PDF_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+function resumeHint() {
+  const f = pfResumeFile || S.profile?.resumeFile;
+  $('pfResumeHint').textContent = f?.name
+    ? `From ${f.name}${f.at ? ', ' + fmtDate(f.at, { month: 'short', day: 'numeric', year: 'numeric' }) : ''}. Upload a newer file any time to replace it.`
+    : 'Upload your résumé above or paste it here, and Claude will draw on it too.';
+}
+async function pdfText(buf) {
+  await loadLib(PDF_WORKER, () => window.pdfjsWorker); // runs the PDF reader on the page itself, no worker needed
+  const lib = await loadLib(PDF_JS, () => window.pdfjsLib);
+  try { lib.GlobalWorkerOptions.workerSrc = PDF_WORKER; } catch (e) {}
+  const doc = await lib.getDocument({ data: new Uint8Array(buf), isEvalSupported: false }).promise;
+  const out = [];
+  for (let i = 1; i <= Math.min(doc.numPages, 12); i++) {
+    const tc = await (await doc.getPage(i)).getTextContent();
+    let line = '';
+    for (const it of tc.items) { line += it.str || ''; if (it.hasEOL) { out.push(line); line = ''; } }
+    if (line) out.push(line);
+    out.push('');
+  }
+  return out.join('\n');
+}
+async function docxText(buf) {
+  const zip = await (await loadJSZip()).loadAsync(buf);
+  const xml = await zip.file('word/document.xml')?.async('string');
+  if (!xml) return '';
+  const W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main', d = new DOMParser().parseFromString(xml, 'application/xml');
+  return [...d.getElementsByTagNameNS(W, 'p')].map(p => {
+    let s = '';
+    for (const n of p.getElementsByTagNameNS(W, '*')) s += n.localName === 't' ? n.textContent : n.localName === 'tab' ? '\t' : n.localName === 'br' ? '\n' : '';
+    return s;
+  }).join('\n');
+}
+const tidyText = t => String(t || '').replace(/\r/g, '').replace(/[ \t ]+\n/g, '\n').replace(/[ \t ]{3,}/g, '   ').replace(/\n{3,}/g, '\n\n').trim();
+async function useResumeFile(file) {
+  if (!file) return;
+  const note = $('pfUpNote'), name = String(file.name || 'résumé'), ext = (name.split('.').pop() || '').toLowerCase();
+  if (file.size > 15 * 1024 * 1024) { note.textContent = 'That file is over 15 MB. Try a smaller PDF or Word file.'; return; }
+  note.innerHTML = `<span class="pulse"></span>Reading ${esc(name)}…`;
+  let text = '';
+  try {
+    const buf = await file.arrayBuffer();
+    if (ext === 'pdf' || file.type === 'application/pdf') text = await pdfText(buf);
+    else if (ext === 'docx') text = await docxText(buf);
+    else if (ext === 'txt' || ext === 'md' || String(file.type).startsWith('text/')) text = new TextDecoder().decode(buf);
+    else { note.textContent = 'Upload a PDF, Word (.docx) or text file. An older .doc file needs saving as .docx first.'; return; }
+  } catch (e) { note.textContent = 'Couldn\'t read that file. Save it as a PDF again, or paste the text into the résumé field.'; return; }
+  text = tidyText(text);
+  if (text.replace(/\s/g, '').length < 80) { note.textContent = 'There\'s no text to pull from this file, which usually means it\'s a scanned image. Paste your résumé text into the résumé field instead.'; return; }
+  $('pf_resume').value = text.slice(0, 30000);
+  pfResumeFile = { name: name.slice(0, 200), at: new Date().toISOString() };
+  resumeHint();
+  await fillFromResume(text);
+}
+async function fillFromResume(text) {
+  const note = $('pfUpNote'), empty = PF_AUTO.filter(k => !String($('pf_' + k)?.value || '').trim());
+  const done = 'Pulled the text into the résumé field. Check the fields, then press Save my info.';
+  if (!sample || !empty.length) { note.textContent = done; return; }
+  note.innerHTML = '<span class="pulse"></span>Claude is filling in the empty fields from your résumé…';
+  const guide = {
+    fullName: 'the person\'s name', email: 'email address as written', phone: 'phone number as written', city: 'city and province, like "Toronto, ON"',
+    linkedin: 'a LinkedIn or portfolio link, starting with https://', program: 'the degree they are studying now and its school',
+    gradDate: 'when they expect to finish that degree, like "June 2028"', background: 'earlier degrees with school and year, then certifications, one per line',
+    skills: 'methods, standards, software and languages, as a comma-separated list',
+    experience: 'each job, research project and course project on its own line as "Role or project, organization, dates: what they did and any result"',
+  };
+  try {
+    const got = await sample.json(`Read the résumé below and return a JSON object with exactly these keys: ${empty.join(', ')}.
+${empty.map(k => `- ${k}: ${guide[k]}`).join('\n')}
+Use only what the résumé states. Never invent or guess anything; use "" for a key the résumé doesn't cover. Plain text values, no Markdown.
+
+Résumé:
+"""
+${text.slice(0, 20000)}
+"""`, { modelTier: 'quick', cache: false });
+    let n = 0;
+    for (const k of empty) {
+      const el = $('pf_' + k), v = typeof got?.[k] === 'string' ? got[k].trim() : '';
+      if (el && v) { el.value = v.slice(0, el.maxLength > 0 ? el.maxLength : 2000); n++; }
+    }
+    note.textContent = n ? `Pulled the text and filled ${n} empty field${n === 1 ? '' : 's'} from your résumé. Check them, then press Save my info.` : done;
+  } catch (e) {
+    note.textContent = 'Pulled the text into the résumé field. Claude couldn\'t fill the other fields just now, so add them yourself, then press Save my info.';
+  }
+}
+$('pfUpBtn').onclick = () => $('pfFile').click();
+$('pfFile').onchange = e => { const f = e.target.files?.[0]; e.target.value = ''; useResumeFile(f); };
+['dragenter', 'dragover'].forEach(t => $('pfUpload').addEventListener(t, e => { e.preventDefault(); $('pfUpload').classList.add('drag'); }));
+['dragleave', 'drop'].forEach(t => $('pfUpload').addEventListener(t, e => { e.preventDefault(); $('pfUpload').classList.remove('drag'); if (t === 'drop') useResumeFile(e.dataTransfer?.files?.[0]); }));
+async function saveProfile(e) {
+  e.preventDefault();
+  const data = {};
+  for (const k of PF_FIELDS) data[k] = String($('pf_' + k)?.value ?? '').trim();
+  if (!data.fullName) { $('pfStatus').textContent = 'Add your full name so letters can be signed.'; $('pf_fullName').focus(); return; }
+  const rf = pfResumeFile || S.profile?.resumeFile; if (rf?.name) data.resumeFile = { name: String(rf.name).slice(0, 200), at: String(rf.at || '') };
+  data.updatedAt = new Date().toISOString();
+  $('pfSave').disabled = true; $('pfStatus').textContent = 'Saving…';
+  try {
+    if (S.localLetters) store.set('profile', data); else await profileRef.set(data);
+    S.profile = data; hideDlg('profileDlg'); toast('Saved your info'); updateNeedInfo();
+  } catch (err) {
+    $('pfStatus').textContent = err?.code === 'quota_exceeded' ? 'The board is full, so your info wasn\'t saved.' : 'Couldn\'t save your info. Check your connection and try again.';
+  } finally { $('pfSave').disabled = false; }
+}
+
+function updateNeedInfo() {
+  const ok = hasInfo();
+  $('ldNeedInfo').hidden = ok;
+  $('ldGo').disabled = !ok || L.busy || !S.letterOn;
+  $('ldGo').textContent = $('ldText').value.trim() ? 'Rewrite letter' : 'Write letter';
+}
+function openLetter(id) {
+  const p = S.postings.get(id); if (!p || !sample) return;
+  L.id = id; L.dirty = false;
+  const saved = S.letters.get(id) || {};
+  $('ldTitle').textContent = p.title || 'Untitled role';
+  $('ldOrg').textContent = [p.employer, p.location].filter(Boolean).join(' · ');
+  $('ldText').value = saved.text || '';
+  $('ldPosting').value = saved.postingText || '';
+  $('ldPasteBox').open = !!saved.postingText;
+  $('ldEmph').value = saved.emphasis || '';
+  $('ldLength').value = ['250', '350', '450'].includes(String(saved.length)) ? String(saved.length) : '350';
+  $('ldStatus').textContent = '';
+  $('ldSaved').textContent = saved.updatedAt ? 'Draft saved ' + fmtTime(saved.updatedAt) : '';
+  $('ldPdf').hidden = $('ldDocx').hidden = $('ldTxt').hidden = !dl;
+  updateNeedInfo();
+  showDlg('letterDlg', hasInfo() ? '#ldGo' : '#ldAddInfo');
+}
+function closeLetter() {
+  if (L.ctl) L.ctl.abort();
+  if (L.dirty) saveLetter(L.id);
+  hideDlg('letterDlg'); L.id = null;
+}
+
+function queueSave() {
+  if (!L.id || L.busy) return;
+  L.dirty = true; clearTimeout(L.timer); $('ldSaved').textContent = 'Saving…';
+  const id = L.id; L.timer = setTimeout(() => saveLetter(id), 1200);
+  $('ldGo').textContent = $('ldText').value.trim() ? 'Rewrite letter' : 'Write letter';
+}
+function saveLetter(id, text) {
+  if (!id) return;
+  clearTimeout(L.timer);
+  const live = L.id === id && !$('letterDlg').hidden;
+  const data = live
+    ? { text: $('ldText').value, postingText: $('ldPosting').value.slice(0, 40000), emphasis: $('ldEmph').value.slice(0, 400), length: +$('ldLength').value || 350 }
+    : Object.assign({}, S.letters.get(id) || {});
+  if (text != null) data.text = text;
+  data.updatedAt = new Date().toISOString();
+  if (live) L.dirty = false;
+  if (!String(data.text || '').trim() && !String(data.postingText || '').trim() && !S.letters.has(id)) { if (live) $('ldSaved').textContent = ''; return; }
+  S.letters.set(id, data); render();
+  const done = msg => { if (L.id === id) $('ldSaved').textContent = msg; };
+  if (S.localLetters) { store.set('letters', Object.fromEntries(S.letters)); done('Draft saved in this browser'); return; }
+  const p = (lpending.get(id) || Promise.resolve())
+    .then(() => profileRef.collection('letters').doc(id).set(data))
+    .then(() => done('Draft saved'), e => done(e?.code === 'quota_exceeded' ? 'The board is full, so this draft wasn\'t saved.' : 'Couldn\'t save this draft. Copy it somewhere safe.'));
+  lpending.set(id, p);
+}
+
+function letterPrompt(p, prof) {
+  const cut = (s, n) => { s = String(s ?? '').trim(); return s.length > n ? s.slice(0, n) + ' [...]' : s; };
+  const ln = (k, v, n = 4000) => (v = cut(v, n)) ? `${k}: ${v}\n` : '';
+  const words = +$('ldLength').value || 350;
+  const today = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const posting = cut($('ldPosting').value, 15000), resume = cut(prof.resume, 15000), emph = cut($('ldEmph').value, 400);
+  const tags = Array.isArray(p.tags) ? p.tags.join(', ') : '';
+  return `Write a cover letter for a graduate student applying to the internship or co-op described below.
+
+How it must read:
+- Professional, plain and direct, the way a capable person writes their own letter. First person. Canadian English spelling. Few or no contractions.
+- No jargon and no buzzwords. Do not use words such as passionate, thrilled, excited, eager, leverage, synergy, dynamic, spearhead, robust, holistic, cutting-edge, invaluable, deeply, journey, landscape, align, impactful or "drive change". Terms of the field such as "GHG inventory" or "ESG reporting" are fine when they name real work.
+- It must not sound machine-written. Do not open with "I am writing to express my interest" or "As a [something] with a passion for". Do not use em dashes, "not only... but also", "not just X but Y", strings of three adjectives, rhetorical questions, a colon that sets up a reveal, or linking words like Moreover, Furthermore, Additionally and In conclusion. Do not end by restating the letter. Vary sentence length the way people naturally do, and give each paragraph one point.
+- Use only facts about the applicant from the APPLICANT section. Never invent employers, projects, numbers, courses, certifications or results. If something useful is missing, leave it out instead of guessing. No placeholders in brackets.
+- Explain why this employer and this role in concrete terms, using only what the ROLE section says. Do not make up facts about the company.
+- Pick at most two examples from the applicant's experience, the ones closest to this role, and connect each to a specific task in the role. Do not walk through the résumé or list projects one after another.
+- In the last paragraph, state the applicant's availability. If it does not fit the role's term, do not claim that it does.
+- Close with one plain sentence asking to discuss the role, then a short thank-you.
+- About ${words} words across the body paragraphs.
+- Plain text only. No Markdown, no bold, no bullet points, no headings.
+
+Layout, in this order, with one blank line between blocks:
+1. The applicant's name, then their city, email, phone and link, one per line, using only the ones given.
+2. ${today}
+3. "Hiring Team", then the employer name, then the role's location, one per line.
+4. "Re: " followed by the role title.
+5. "Dear Hiring Team,"
+6. Three or four body paragraphs.
+7. "${cut(prof.signoff, 40) || 'Sincerely'}," then the applicant's name on the next line.
+
+ROLE
+${ln('Title', p.title)}${ln('Employer', p.employer)}${ln('Location', [p.location, p.workMode].filter(Boolean).join(', '))}${ln('Type', p.type)}${ln('Term', p.term)}${p.durationMonths ? ln('Length', p.durationMonths + ' months') : ''}${ln('What the work involves', p.summary)}${ln('Areas', tags)}${ln('Who can apply', p.eligibility)}${ln('Note from the job board on why it suits an MScSM student', p.fit)}${posting ? `Full posting, pasted by the applicant:\n"""\n${posting}\n"""\n` : ''}
+APPLICANT
+${ln('Name', prof.fullName, 120)}${ln('City', prof.city, 80)}${ln('Email', prof.email, 160)}${ln('Phone', prof.phone, 40)}${ln('Link', prof.linkedin, 300)}${ln('Program', prof.program)}${ln('Expected graduation', prof.gradDate)}${ln('Availability', prof.availability)}${ln('Previous degrees', prof.background)}${ln('Skills and tools', prof.skills)}${ln('Experience', prof.experience, 12000)}${ln('What they want from a placement', prof.goals)}${resume ? `Résumé text:\n"""\n${resume}\n"""\n` : ''}${emph ? `\nThe applicant wants the letter to stress: ${emph}\n` : ''}
+Reply with the letter text only.`;
+}
+function tidyLetter(t) {
+  return String(t || '').replace(/^\s*```[a-z]*\s*\n?/i, '').replace(/\n?```\s*$/, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\s*—\s*/g, ', ').replace(/\n{3,}/g, '\n\n').trim();
+}
+function letterError(c) {
+  return ({
+    not_granted: 'Claude isn\'t allowed to write for this board. Allow it when the board asks, then reopen the board.',
+    sampling_disabled: 'Claude can\'t write letters for your account in this view.',
+    rate_limited: 'You\'ve reached a usage limit. Try again in a little while.',
+    session_expired: 'Sign in to Claude again, then press Write letter.',
+    prompt_too_large: 'Your résumé or the pasted posting is too long. Shorten one and try again.',
+    refused: 'Claude couldn\'t write a letter from this. Try changing what you pasted.',
+    empty_completion: 'Claude returned an empty letter. Try again.',
+  })[c] || 'Something interrupted the letter. Try again.';
+}
+async function writeLetter() {
+  const id = L.id, p = S.postings.get(id);
+  if (!p || !sample || L.busy) return;
+  if (!hasInfo()) { updateNeedInfo(); return; }
+  const prev = $('ldText').value, ctl = new AbortController();
+  L.ctl = ctl; L.busy = true; clearTimeout(L.timer);
+  $('ldGo').disabled = true; $('ldStop').hidden = false; $('ldText').readOnly = true;
+  $('ldStatus').innerHTML = '<span class="pulse"></span>Thinking…';
+  try {
+    const res = await sample(letterPrompt(p, S.profile || {}), {
+      signal: ctl.signal, cache: false,
+      onText: ({ text }) => { if (L.id === id) { $('ldText').value = text; $('ldStatus').textContent = 'Writing…'; } },
+    });
+    const clean = tidyLetter(res.text);
+    if (L.id === id) { $('ldText').value = clean; $('ldStatus').textContent = res.truncated ? 'The letter was cut short. Try the Short length.' : 'Done. Edit anything you like, and changes save as you type.'; }
+    saveLetter(id, clean);
+  } catch (e) {
+    const c = e?.code;
+    if (L.id === id) {
+      $('ldText').value = c === 'refused' ? prev : (e?.text ? tidyLetter(e.text) : prev);
+      $('ldStatus').textContent = c === 'cancelled' ? 'Stopped.' : letterError(c);
+    }
+    if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(c)) { S.letterOn = false; render(); }
+  } finally {
+    if (L.ctl === ctl) L.ctl = null;
+    L.busy = false; $('ldStop').hidden = true; $('ldText').readOnly = false; updateNeedInfo();
+  }
+}
+
+function letterFileName(ext) {
+  const p = S.postings.get(L.id) || {}, n = String(S.profile?.fullName || '').trim();
+  return ['Cover letter', p.employer, n].filter(Boolean).join(' - ').replace(/[\\/:*?"<>|]+/g, '').slice(0, 150) + '.' + ext;
+}
+const libs = {};
+function loadLib(src, get) {
+  if (get()) return Promise.resolve(get());
+  return libs[src] = libs[src] || new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = src;
+    s.onload = () => get() ? res(get()) : rej(new Error('library missing'));
+    s.onerror = () => { delete libs[src]; rej(new Error('library failed to load')); };
+    document.head.appendChild(s);
+  });
+}
+const loadJSZip = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js', () => window.JSZip);
+async function pdfBlob(text) {
+  const { jsPDF } = await loadLib('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', () => window.jspdf);
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const margin = 72, width = doc.internal.pageSize.getWidth() - margin * 2, pageH = doc.internal.pageSize.getHeight(), lh = 15.5;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+  const clean = text.replace(/\r/g, '').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, '-').replace(/…/g, '...');
+  let y = margin;
+  for (const para of clean.split('\n')) {
+    const lines = para.trim() ? doc.splitTextToSize(para, width) : [''];
+    for (const l of lines) { if (y > pageH - margin) { doc.addPage(); y = margin; } if (l) doc.text(l, margin, y); y += lh; }
+  }
+  const p = S.postings.get(L.id) || {};
+  doc.setProperties({ title: ['Cover letter', p.employer].filter(Boolean).join(' - '), author: String(S.profile?.fullName || '') });
+  return doc.output('blob');
+}
+async function docxBlob(text) {
+  const JSZip = await loadJSZip();
+  const x = s => s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const rpr = '<w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/><w:sz w:val="22"/></w:rPr>';
+  const ppr = '<w:pPr><w:spacing w:after="0" w:line="276" w:lineRule="auto"/>' + rpr + '</w:pPr>';
+  const body = text.replace(/\r/g, '').split('\n').map(l => l.trim() ? `<w:p>${ppr}<w:r>${rpr}<w:t xml:space="preserve">${x(l)}</w:t></w:r></w:p>` : `<w:p>${ppr}</w:p>`).join('');
+  const zip = new JSZip();
+  zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+  zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+  zip.file('word/document.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + body + '<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/></w:sectPr></w:body></w:document>');
+  return zip.generateAsync({ type: 'blob', compression: 'DEFLATE', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+
+$('profileBtn').onclick = openProfile;
+$('pfForm').addEventListener('submit', saveProfile);
+$('pfClose').onclick = $('pfCancel').onclick = () => hideDlg('profileDlg');
+$('ldClose').onclick = closeLetter;
+$('ldAddInfo').onclick = openProfile;
+$('ldGo').onclick = writeLetter;
+$('ldStop').onclick = () => { if (L.ctl) L.ctl.abort(); };
+['ldText', 'ldPosting', 'ldEmph'].forEach(k => $(k).addEventListener('input', queueSave));
+$('ldLength').addEventListener('change', queueSave);
+$('letterDlg').addEventListener('mousedown', e => { if (e.target === e.currentTarget && !L.busy) closeLetter(); });
+$('profileDlg').addEventListener('mousedown', e => { if (e.target === e.currentTarget) hideDlg('profileDlg'); });
+document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (!$('profileDlg').hidden) hideDlg('profileDlg'); else if (!$('letterDlg').hidden) closeLetter(); });
+$('ldCopy').onclick = () => {
+  const t = $('ldText').value;
+  if (!t.trim()) { toast('Write the letter first.'); return; }
+  const fallback = () => { $('ldText').focus(); $('ldText').select(); toast('Selected. Press Ctrl+C or ⌘C to copy.'); };
+  try { navigator.clipboard.writeText(t).then(() => toast('Copied the letter'), fallback); } catch (e) { fallback(); }
+};
+$('ldTxt').onclick = () => { const t = $('ldText').value; if (!t.trim()) { toast('Write the letter first.'); return; } saveFile(letterFileName('txt'), t.replace(/\r?\n/g, '\r\n')); };
+$('ldDocx').onclick = async () => {
+  const t = $('ldText').value; if (!t.trim()) { toast('Write the letter first.'); return; }
+  const b = $('ldDocx'); b.disabled = true;
+  try { await saveFile(letterFileName('docx'), await docxBlob(t)); }
+  catch (e) { toast('Couldn\'t build the Word file. Use Copy or .txt instead.'); }
+  finally { b.disabled = false; }
+};
+$('ldPdf').onclick = async () => {
+  const t = $('ldText').value; if (!t.trim()) { toast('Write the letter first.'); return; }
+  const b = $('ldPdf'); b.disabled = true;
+  try { await saveFile(letterFileName('pdf'), await pdfBlob(t)); }
+  catch (e) { toast('Couldn\'t build the PDF. Use Copy or .docx instead.'); }
+  finally { b.disabled = false; }
+};
+
+/* ---------- Mac app ----------
+   In the Claude desktop app the board can be installed as its own Mac app (Dock icon, own window).
+   Inside that window: radar Dock icon, a Dock badge with the number of open roles you haven't sorted yet,
+   and an optional notification when a refresh finishes. */
+let desk = null, deskBadge = null, notifyOk = false;
+function radarIcon() {
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 512;
+    const g = c.getContext('2d'), cx = 256, cy = 256, a0 = -Math.PI / 2;
+    g.fillStyle = '#0f6873'; g.beginPath();
+    if (g.roundRect) g.roundRect(32, 32, 448, 448, 108); else g.rect(32, 32, 448, 448);
+    g.fill();
+    g.fillStyle = 'rgba(220, 236, 238, 0.32)'; g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, 186, a0, a0 + 0.95); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(255, 255, 255, 0.92)'; g.lineWidth = 13;
+    for (const rad of [66, 126, 186]) { g.beginPath(); g.arc(cx, cy, rad, 0, Math.PI * 2); g.stroke(); }
+    g.strokeStyle = '#ffffff'; g.lineWidth = 15; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + 186 * Math.cos(a0 + 0.95), cy + 186 * Math.sin(a0 + 0.95)); g.stroke();
+    g.fillStyle = '#f0a75e'; g.beginPath(); g.arc(cx + 126 * Math.cos(a0 + 0.5), cy + 126 * Math.sin(a0 + 0.5), 22, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#ffffff'; g.beginPath(); g.arc(cx, cy, 15, 0, Math.PI * 2); g.fill();
+    return c.toDataURL('image/png');
+  } catch (e) { return null; }
+}
+function updateBadge() {
+  if (!desk || !S.loaded) return;
+  const n = [...S.postings.values()].filter(p => isOpen(p) && !trackState(p.id)).length;
+  const t = n ? String(n) : '';
+  if (t !== deskBadge) { deskBadge = t; desk.app.dock.setBadge(t).catch(() => {}); }
+}
+function notifyRun(prev, run) {
+  if (!desk || !notifyOk || prev?.state !== 'running' || !run || run.state === 'running') return;
+  const n = +run.added || 0;
+  const body = run.state === 'error' ? 'The refresh hit a problem. Open the board to try again.'
+    : n ? `Found ${n} new role${n === 1 ? '' : 's'}.${run.note ? ' ' + String(run.note) : ''}` : 'Refresh finished. No new roles this time.';
+  desk.notification.show({ body: body.slice(0, 300) }).catch(() => {});
+}
+async function initDesktop() {
+  if (SNAP || !window.claude?.use) return;
+  let d = null;
+  try { d = await window.claude.use('desktop'); } catch (e) { d = null; }
+  if (!d) return;
+  if (d.window && d.app?.dock) {
+    desk = d; document.documentElement.classList.add('desk');
+    d.window.setOptions({ titleBarStyle: 'hiddenInset', dragHeight: 40, minWidth: 420, minHeight: 560 }).catch(() => {});
+    const icon = radarIcon(); if (icon) d.app.dock.setIcon(icon).catch(() => {});
+    let st = 'unavailable';
+    try { st = await d.permissions.state('notifications'); } catch (e) {}
+    notifyOk = st === 'granted';
+    const nb = $('notifyBtn');
+    nb.hidden = st !== 'prompt';
+    nb.onclick = async () => {
+      try {
+        const r = await d.permissions.request(['notifications']);
+        notifyOk = r.notifications === 'granted'; nb.hidden = true;
+        toast(notifyOk ? 'You\'ll get a notification when a refresh finishes.' : 'Notifications are off. You can turn them on from the app\'s Permissions menu.');
+      } catch (e) { toast('Couldn\'t ask for notifications right now. Try again in a moment.'); }
+    };
+    updateBadge();
+    return;
+  }
+  try {
+    if ((await d.install?.state()) !== 'available') return;
+    const b = $('installBtn'); b.hidden = false;
+    b.onclick = () => d.install.request().then(r => {
+      if (r === 'installed') { b.hidden = true; toast('Installing Co-op Radar as a Mac app.'); }
+      else if (r === 'failed' || r === 'unavailable') toast('Couldn\'t install it from here. Use Install as app in the artifact\'s menu.');
+    }).catch(() => toast('Couldn\'t install it from here. Use Install as app in the artifact\'s menu.'));
+  } catch (e) {}
+}
+
+setInterval(() => { renderRefresh(); }, 30000);
+
+(async () => {
+  if (SNAP) {
+    // offline copy: data is baked in, no database and no refresh
+    S.postings = new Map((SNAP.postings || []).map(p => [p.id, p]));
+    const t = store.get('snapTracking', null) || SNAP.tracking || {};
+    S.tracking = new Map(Object.entries(t).map(([k, v]) => [k, { id: k, state: v }]));
+    S.loaded = true; S.run = SNAP.run;
+    $('refreshBtn').hidden = true; $('saveHtml').hidden = true; $('saveCsv').hidden = false; $('exportBtn').hidden = false;
+    $('profileBtn').hidden = true; $('letterDlg').hidden = true; $('profileDlg').hidden = true;
+    $('installBtn').hidden = true; $('notifyBtn').hidden = true; $('soundBtn').hidden = true;
+    $('runStatus').innerHTML = `<div class="snapnote">Snapshot from ${esc(fmtTime(SNAP.takenAt))}. The list updates when a new snapshot is posted, so check each posting before you apply. Your Saved and Applied marks stay in this browser.</div><a class="btn sm" href="../" style="margin-top:8px">← More projects<\/a><div hidden></div>`;
+    render();
+    return;
+  }
+  render(); renderRefresh();
+  if (window.claude?.use) window.claude.use('downloads').then(x => { dl = x; if (dl) { $('saveHtml').hidden = false; $('saveCsv').hidden = false; $('exportBtn').hidden = false; } }).catch(() => {});
+  initDesktop();
+  db = window.claude?.use ? await window.claude.use('db') : null;
+  if (!db) { S.dbOk = false; render(); renderRefresh(); return; }
+  const loadTimer = setTimeout(() => { if (!S.loaded) { $('runStatus').textContent = 'Your board can\'t be reached yet. It will load when the connection returns.'; } }, 10000);
+  const onErr = e => { if (e?.code === 'revoked' || e?.code === 'not_granted') { S.dbOk = false; render(); renderRefresh(); } };
+  db.collection('postings').onSnapshot(snap => {
+    S.postings = new Map(snap.docs.map(d => [d.id, Object.assign({ id: d.id }, d.data())]));
+    if (!snap.metadata.fromCache) { S.loaded = true; clearTimeout(loadTimer); } else if (snap.size) S.loaded = true;
+    render(); renderRefresh(); updateBadge();
+  }, onErr);
+  db.collection('tracking').onSnapshot(snap => { S.tracking = new Map(snap.docs.map(d => [d.id, Object.assign({ id: d.id }, d.data())])); render(); updateBadge(); }, onErr);
+  db.doc('meta/run').onSnapshot(s => { const prev = S.run; S.run = s.exists ? s.data() : null; renderRefresh(); notifyRun(prev, S.run); }, onErr);
+  db.doc('meta/request').onSnapshot(s => { S.request = s.exists ? s.data() : null; renderRefresh(); }, onErr);
+  db.doc('config/main').onSnapshot(s => { S.config = s.exists ? s.data() : null; renderRefresh(); }, onErr);
+  initLetters();
+  try { mcp = await window.claude.use('mcp'); } catch (e) { mcp = null; }
+  renderRefresh();
+})();
+</script>
+</body>
+</html>
