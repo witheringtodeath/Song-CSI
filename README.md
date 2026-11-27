@@ -1,6 +1,6 @@
-# witheringtodeath_
+# witheringtodeath
 
-Projects by witheringtodeath_.
+Projects by witheringtodeath.
 
 - **Song CSI**: a Mac app that finds the beat, the key and every chord in a song, writes out tabs for guitar, bass, piano and drums, and splits it into every instrument so you can play along. See `song-csi/`.
 - **MScSM Co-op Radar**: a board of paid sustainability internships and co-ops in the GTA and remote in Canada, for the May–August 2027 work term. See `coop-radar/`.
